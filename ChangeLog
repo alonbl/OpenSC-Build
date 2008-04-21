@@ -1,0 +1,18 @@
+OpenSC Project Windows Build
+Copyright (c) 2008 The OpenSC Project
+Copyright (c) 2008 Alon Bar-Lev <alon.barlev@gmail.com>
+
+$Id$
+
+????-??-?? - Version 0.0
+
+ * Components versions:
+
+	libtool-1.5.26 ????
+	zlib-1.2.3 ????????
+	openssl-???????????
+	opensc-0.11.5
+	libp11-0.2.4
+	engine_pkcs11-0.1.5
+
+ * Initial implementation.

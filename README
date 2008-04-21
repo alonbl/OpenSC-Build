@@ -1,0 +1,58 @@
+OpenSC Project Windows Build
+
+About
+
+	This environment provides an easy way to build
+	OpenSC Project components for Windows.
+
+	The OpenSC Project does not provide CSP for Windows,
+	any CSP that can use PKCS#11 interface can be used
+	with the components.
+
+Versions
+
+	The tarballs are taken from "DISTDIR" directory, the
+	version is not forced. If tarball is missing it is
+	downloaded from its site using a specific version.
+
+Cross compile
+
+	$ CHOST=i686-pc-mingw32 CBUILD=i686-pc-linux-gnu ./build
+
+MSYS
+	Download and install wget msys port.
+
+	$ WGET=/c/msys/1.0/bin/wget ./build
+
+	The WGET is a workaround for msys wget port issue with argv[0].
+
+Environment
+
+	WGET
+		wget to use, default wget.
+	WGET_OPTS
+		options for wget, default empty.
+
+	MAKEOPTS
+		options for make, default "-j2".
+	CHOST
+		host to build to, default empty (native).
+	CTARGET
+		target to build to, default CHOST.
+	CBUILD
+		target of local host, default CHOST.
+
+	IMAGEROOT
+		output goes here, default "image".
+	BUILDROOT
+		build goes here, default "tmp".
+	DISTDIR
+		tarballs expeced to be here, default "distfiles".
+
+	ZLIB_VERSION
+	LIBTOOL_VERSION
+	OPENSSL_VERSION
+	OPENSC_VERSION
+	LIP11_VERSION
+	ENGINE_PKCS11_VERSION
+		versions.
