@@ -118,9 +118,9 @@ extract() {
 	done
 }
 
-build() {
+build_dep() {
 	echo "Build zlib"
-	cd "${BUILDROOT}/zlib"*
+	cd "${BUILDROOT}/zlib"* || die "cd zlib"
 	make -f win32/Makefile.gcc \
 		PREFIX=${CHOST:+${CHOST}-} \
 		INCLUDE_PATH="${IMAGEROOT}/include" \
@@ -130,13 +130,13 @@ build() {
 		die "make zlib"
 
 	echo "Build libtool"
-	cd "${BUILDROOT}/libtool"*
+	cd "${BUILDROOT}/libtool"* || die "cd libtool"
 	./configure ${CONFIGOPTS} || die "Configure libtool"
 	make ${MAKEOPTS} install DESTDIR="${IMAGEROOT}" || die "make opensc"
 	fixup_la
 
 	echo "Build openssl"
-	cd "${BUILDROOT}/openssl"*
+	cd "${BUILDROOT}/openssl"* || die "cd openssl"
 	# cms cannot compile in latest (20080314) snapshot
 	./Configure --prefix="//" --cross-compile-prefix=${CHOST:+${CHOST}-} \
 		no-zlib shared mingw \
@@ -146,8 +146,15 @@ build() {
 		|| die "make openssl"
 	rm -fr "${IMAGEROOT}/tmp"
 
+	cd "${SCRIPTROOT}"
+	restore_la
+}
+
+build_opensc() {
+	fixup_la
+
 	echo "Build opensc"
-	cd "${BUILDROOT}/opensc"*
+	cd "${BUILDROOT}/opensc"* || die "cd opensc"
 	./configure ${CONFIGOPTS} \
 		--enable-openssl --enable-zlib --enable-pcsc --enable-doc \
 		LTLIB_CFLAGS="-I${IMAGEROOT}/include" LTLIB_LIBS="-L${IMAGEROOT}/lib -lltdl" \
@@ -158,7 +165,7 @@ build() {
 	fixup_la
 
 	echo "Build libp11"
-	cd "${BUILDROOT}/libp11"*
+	cd "${BUILDROOT}/libp11"* || die "cd libp11"
 	./configure ${CONFIGOPTS} \
 		--enable-doc \
 		LTLIB_CFLAGS="-I${IMAGEROOT}/include" LTLIB_LIBS="-L${IMAGEROOT}/lib -lltdl" \
@@ -169,7 +176,7 @@ build() {
 	fixup_la
 
 	echo "Build engine_pkcs11"
-	cd "${BUILDROOT}/engine_pkcs11"*
+	cd "${BUILDROOT}/engine_pkcs11"* || die "cd engine_pkcs11"
 	./configure ${CONFIGOPTS} \
 		--enable-doc \
 		--with-enginesdir="/lib/engines" \
@@ -177,6 +184,8 @@ build() {
 		LIBP11_CFLAGS="-I${IMAGEROOT}/include" LIBP11_LIBS="-L${IMAGEROOT}/lib -lp11" \
 		|| die "Configure engine_pkcs11"
 	make ${MAKEOPTS} install DESTDIR="${IMAGEROOT}" || die "make engine_pkcs11"
+
+	fixup_la
 
 if false; then
 	echo "Build csp11"
@@ -192,8 +201,8 @@ if false; then
 	cp *.exe "${IMAGEROOT}/bin"
 fi
 
-	restore_la
 	cd "${SCRIPTROOT}"
+	restore_la
 }
 
 copy_docs() {
@@ -232,7 +241,8 @@ CONFIGOPTS="--prefix=/ --host=${CHOST} --target=${CTARGET} --build=${CBUILD} PKG
 download
 create_layout
 extract
-build
+build_dep
+build_opensc
 copy_docs
 copy_sources
 clean_empty_dirs
