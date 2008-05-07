@@ -1,5 +1,5 @@
 #!/bin/sh
-# OpenSC Project Windows Build
+# OpenSC Project Cross Compile Build
 # Copyright (c) 2008 The OpenSC Project
 # Copyright (C) 2008 Alon Bar-Lev <alon.barlev@gmail.com>
 #
@@ -23,8 +23,10 @@
 # full version:
 # WGET=/c/msys/1.0/bin/wget
 #
-# cross compile:
+# Cross compile for Windows:
 # CHOST=i686-pc-mingw32 CBUILD=i686-pc-linux-gnu
+# Cross compile for uClibc:
+# CHOST=i586-pc-linux-uclibc CBUILD=i686-pc-linux-gnu
 #
 
 die() {
@@ -79,13 +81,14 @@ download() {
 	download1 "http://www.zlib.net/zlib-${ZLIB_VERSION}.tar.gz"
 	download1 "http://ftp.gnu.org/gnu/libtool/libtool-${LIBTOOL_VERSION}.tar.gz"
 	download1 "http://mirrors.usc.edu/pub/openssl/snapshot/openssl-${OPENSSL_VERSION}.tar.gz"
+	download1 "http://www.opensc-project.org/files/opensc/openct-${OPENCT_VERSION}.tar.gz"
 	download1 "http://www.opensc-project.org/files/opensc/opensc-${OPENSC_VERSION}.tar.gz"
 	download1 "http://www.opensc-project.org/files/libp11/libp11-${LIP11_VERSION}.tar.gz"
 	download1 "http://www.opensc-project.org/files/engine_pkcs11/engine_pkcs11-${ENGINE_PKCS11_VERSION}.tar.gz"
 #	download1 "http://www.opensc-project.org/files/scb/csp11-${CSP11_VERSION}.tar.gz"
 #	download1 "http://www.opensc-project.org/svn/scb/trunk/putty-${PUTTY_VERSION}.tar.gz"
 
-	if [ "$(ls "${DISTDIR}" | wc -l | sed 's/[ \t]//g')" != 6 ]; then
+	if [ "$(ls "${DISTDIR}" | wc -l | sed 's/[ \t]//g')" != 7 ]; then
 		die "distfiles is unclean."
 	fi
 }
@@ -121,13 +124,18 @@ extract() {
 build_dep() {
 	echo "Build zlib"
 	cd "${BUILDROOT}/zlib"* || die "cd zlib"
-	make -f win32/Makefile.gcc \
-		PREFIX=${CHOST:+${CHOST}-} \
-		INCLUDE_PATH="${IMAGEROOT}/include" \
-		LIBRARY_PATH="${IMAGEROOT}/lib" \
-		BINARY_PATH="${IMAGEROOT}/bin" \
-		install || \
-		die "make zlib"
+	if [ -n "${BUILD_FOR_WINDOWS}" ]; then
+		make -f win32/Makefile.gcc \
+			PREFIX=${CHOST:+${CHOST}-} \
+			INCLUDE_PATH="${IMAGEROOT}/include" \
+			LIBRARY_PATH="${IMAGEROOT}/lib" \
+			BINARY_PATH="${IMAGEROOT}/bin" \
+			install || \
+			die "make zlib"
+	else
+		CHOST="${CHOST}" LDCONFIG=true ./configure --shared --prefix=/ || die "configure zlib"
+		make install DESTDIR="${IMAGEROOT}" || die "make zlib"
+	fi
 
 	echo "Build libtool"
 	cd "${BUILDROOT}/libtool"* || die "cd libtool"
@@ -137,11 +145,13 @@ build_dep() {
 
 	echo "Build openssl"
 	cd "${BUILDROOT}/openssl"* || die "cd openssl"
-	# cms cannot compile in latest (20080314) snapshot
+
 	./Configure --prefix="//" --cross-compile-prefix=${CHOST:+${CHOST}-} \
-		no-zlib shared mingw \
+		no-zlib shared $(CHOST="${CHOST}" "${SCRIPTROOT}/gentoo.config-0.9.8") \
 		|| die "Configure openssl"
-	perl util/mkdef.pl crypto update
+	if [ -n "${BUILD_FOR_WINDOWS}" ]; then
+		perl util/mkdef.pl crypto update
+	fi
 	make depend install INSTALL_PREFIX="${IMAGEROOT}" INSTALLTOP="/" MANDIR="/tmp" \
 		|| die "make openssl"
 	rm -fr "${IMAGEROOT}/tmp"
@@ -151,25 +161,54 @@ build_dep() {
 }
 
 build_opensc() {
+
+	local LTLIB_LIBS="-L${IMAGEROOT}/lib -lltdl"
+	local ZLIB_LIBS="-L${IMAGEROOT}/lib -lz"
+	local OPENSSL_LIBS="-L${IMAGEROOT}/lib -lcrypto"
+
+	if [ -n "${BUILD_FOR_WINDOWS}" ]; then
+		ZLIB_LIBS="-L${IMAGEROOT}/lib -lzdll"
+		OPENSSL_LIBS="-L${IMAGEROOT}/bin -leay32"
+	fi
+
 	fixup_la
+
+	local extra_opensc
+	echo "${OPENSC_COMPONENTS}" | grep pcsc > /dev/null && extra_opensc="${extra_opensc} --enable-pcsc"
+
+	if echo "${OPENSC_COMPONENTS}" | grep openct > /dev/null; then
+		extra_opensc="${extra_opensc} --enable-openct"
+
+		echo "Build openct"
+		cd "${BUILDROOT}/openct"* || die "cd openct"
+		./configure ${CONFIGOPTS} \
+			${extra_opensc} --enable-doc --with-udev \
+			LTLIB_CFLAGS="-I${IMAGEROOT}/include" LTLIB_LIBS="${LTLIB_LIBS}" \
+			|| die "Configure openct"
+		make ${MAKEOPTS} install DESTDIR="${IMAGEROOT}" || die "make openct"
+
+		fixup_la
+	fi
 
 	echo "Build opensc"
 	cd "${BUILDROOT}/opensc"* || die "cd opensc"
 	./configure ${CONFIGOPTS} \
-		--enable-openssl --enable-zlib --enable-pcsc --enable-doc \
-		LTLIB_CFLAGS="-I${IMAGEROOT}/include" LTLIB_LIBS="-L${IMAGEROOT}/lib -lltdl" \
-		ZLIB_CFLAGS="-I${IMAGEROOT}/include" ZLIB_LIBS="-L${IMAGEROOT}/lib -lzdll" \
-		OPENSSL_CFLAGS="-I${IMAGEROOT}/include" OPENSSL_LIBS="-L${IMAGEROOT}/bin -leay32" \
+		--enable-openssl --enable-zlib ${extra_opensc} --enable-doc \
+		LTLIB_CFLAGS="-I${IMAGEROOT}/include" LTLIB_LIBS="${LTLIB_LIBS}" \
+		ZLIB_CFLAGS="-I${IMAGEROOT}/include" ZLIB_LIBS="${ZLIB_LIBS}" \
+		OPENSSL_CFLAGS="-I${IMAGEROOT}/include" OPENSSL_LIBS="${OPENSSL_LIBS}" \
+		OPENCT_CFLAGS="-I${IMAGEROOT}/include" OPENCT_LIBS="-L${IMAGEROOT}/lib -lopenct" \
 		|| die "Configure opensc"
 	make ${MAKEOPTS} install DESTDIR="${IMAGEROOT}" || die "make opensc"
+
 	fixup_la
 
 	echo "Build libp11"
 	cd "${BUILDROOT}/libp11"* || die "cd libp11"
 	./configure ${CONFIGOPTS} \
 		--enable-doc \
-		LTLIB_CFLAGS="-I${IMAGEROOT}/include" LTLIB_LIBS="-L${IMAGEROOT}/lib -lltdl" \
-		OPENSSL_CFLAGS="-I${IMAGEROOT}/include" OPENSSL_LIBS="-L${IMAGEROOT}/bin -leay32" \
+		LTLIB_CFLAGS="-I${IMAGEROOT}/include" LTLIB_LIBS="${LTLIB_LIBS}" \
+		OPENSSL_CFLAGS="-I${IMAGEROOT}/include" OPENSSL_LIBS="${OPENSSL_LIBS}" \
 		|| die "Configure libp11"
 	make ${MAKEOPTS} install DESTDIR="${IMAGEROOT}" || die "make libp11"
 
@@ -180,7 +219,7 @@ build_opensc() {
 	./configure ${CONFIGOPTS} \
 		--enable-doc \
 		--with-enginesdir="/lib/engines" \
-		OPENSSL_CFLAGS="-I${IMAGEROOT}/include" OPENSSL_LIBS="-L${IMAGEROOT}/bin -leay32" \
+		OPENSSL_CFLAGS="-I${IMAGEROOT}/include" OPENSSL_LIBS="${OPENSSL_LIBS}" \
 		LIBP11_CFLAGS="-I${IMAGEROOT}/include" LIBP11_LIBS="-L${IMAGEROOT}/lib -lp11" \
 		|| die "Configure engine_pkcs11"
 	make ${MAKEOPTS} install DESTDIR="${IMAGEROOT}" || die "make engine_pkcs11"
@@ -197,7 +236,7 @@ if false; then
 	echo "Build putty"
 	cd "${BUILDROOT}/putty"*
 	cd windows
-	make -f Makefile.cyg TOOLPATH=${CHOST}-
+	make -f Makefile.cyg TOOLPATH="${CHOST}-"
 	cp *.exe "${IMAGEROOT}/bin"
 fi
 
@@ -233,10 +272,15 @@ IMAGEROOT="${IMAGEROOT:-${SCRIPTROOT}/image}"
 BUILDROOT="${BUILDROOT:-${SCRIPTROOT}/tmp}"
 DISTDIR="${DISTDIR:-${SCRIPTROOT}/distfiles}"
 PATCHDIR="${SCRIPTROOT}/patches"
+echo "${CHOST}" | grep "mingw" > /dev/null && BUILD_FOR_WINDOWS=1
 
 CONFIGOPTS="--prefix=/ --host=${CHOST} --target=${CTARGET} --build=${CBUILD} PKG_CONFIG=true"
 
 . "${SCRIPTROOT}/fetch.versions" || die "Cannot source versions"
+
+if [ -n "${BUILD_FOR_WINDOWS}" ]; then
+	OPENSC_COMPONENTS="pcsc"
+fi
 
 download
 create_layout
