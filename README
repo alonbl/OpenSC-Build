@@ -1,9 +1,9 @@
-OpenSC Project Windows Build
+OpenSC Project Cross Compile Build
 
 About
 
 	This environment provides an easy way to build
-	OpenSC Project components for Windows.
+	OpenSC Project components using a cross compiler.
 
 	The OpenSC Project does not provide CSP for Windows,
 	any CSP that can use PKCS#11 interface can be used
@@ -56,3 +56,6 @@ Environment
 	LIP11_VERSION
 	ENGINE_PKCS11_VERSION
 		versions.
+
+	OPENSC_COMPONENTS
+		pcsc, openct
