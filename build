@@ -168,7 +168,6 @@ build_opensc() {
 
 	if [ -n "${BUILD_FOR_WINDOWS}" ]; then
 		ZLIB_LIBS="-L${IMAGEROOT}/lib -lzdll"
-		OPENSSL_LIBS="-L${IMAGEROOT}/bin -leay32"
 	fi
 
 	fixup_la
