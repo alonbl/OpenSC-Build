@@ -241,7 +241,6 @@ build_openvpn() {
 	./configure ${CONFIGOPTS} \
 		--disable-crypto-engine-gnutls \
 		--disable-crypto-engine-nss \
-		MAN2HTML=true \
 		|| die "Configure pkcs11-helper"
 	make ${MAKEOPTS} install DESTDIR="${OPENVPN_ROOT}" || die "make pkcs11-helper"
 
@@ -306,14 +305,9 @@ CONFIGOPTS=" \
 	--target=${CTARGET} \
 	--build=${CBUILD} \
 	--program-prefix='' \
-	PKG_CONFIG=true \
 "
 
 . "${SCRIPTROOT}/fetch.versions" || die "Cannot source versions"
-
-if [ -n "${BUILD_FOR_WINDOWS}" ]; then
-	OPENSC_COMPONENTS="pcsc"
-fi
 
 OPENSC_ROOT="${IMAGEROOT}/opensc"
 ENGINE_PKCS11_ROOT="${IMAGEROOT}/engine_pkcs11"
@@ -331,6 +325,9 @@ export LIBP11_CFLAGS="-I${ENGINE_PKCS11_ROOT}/include"
 export LIBP11_LIBS="-L${ENGINE_PKCS11_ROOT}/lib -lp11"
 
 if [ -n "${BUILD_FOR_WINDOWS}" ]; then
+	OPENSC_COMPONENTS="pcsc"
+	export PKG_CONFIG="true"
+	export MAN2HTML="true"
 	export ZLIB_LIBS="-L${OPENSC_ROOT}/lib -lzdll"
 fi
 
