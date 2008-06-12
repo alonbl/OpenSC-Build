@@ -177,7 +177,7 @@ build_opensc() {
 		echo "Build openct"
 		cd "${BUILDROOT}/openct"* || die "cd openct"
 		./configure ${CONFIGOPTS} \
-			${extra_opensc} --enable-doc --with-udev \
+			${extra_opensc} --enable-doc \
 			|| die "Configure openct"
 		make ${MAKEOPTS} install DESTDIR="${OPENSC_ROOT}" || die "make openct"
 
@@ -325,6 +325,8 @@ export ZLIB_CFLAGS="${LTLIB_CFLAGS}"
 export ZLIB_LIBS="-L${OPENSC_ROOT}/lib -lz"
 export OPENSSL_CFLAGS="${LTLIB_CFLAGS}"
 export OPENSSL_LIBS="-L${OPENSC_ROOT}/lib -lcrypto"
+export OPENCT_CFLAGS="${LTLIB_CFLAGS}"
+export OPENCT_LIBS="-L${OPENSC_ROOT}/lib -lopenct"
 export LIBP11_CFLAGS="-I${ENGINE_PKCS11_ROOT}/include"
 export LIBP11_LIBS="-L${ENGINE_PKCS11_ROOT}/lib -lp11"
 
