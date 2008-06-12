@@ -2,77 +2,134 @@ Smart Card Bundle License
 =========================
 
 1.) This software package contains OpenSSL:
-Copyright (c) 1998-2004 The OpenSSL Project.  All rights reserved.
-This product includes software developed by the OpenSSL Project
-for use in the OpenSSL Toolkit. (http://www.openssl.org/)
+
+	Copyright (c) 1998-2004 The OpenSSL Project.  All rights reserved.
+	This product includes software developed by the OpenSSL Project
+	for use in the OpenSSL Toolkit. (http://www.openssl.org/)
 
 2.) This software package contains OpenSC:
-OpenSC smart card library
-Copyright (C) OpenSC developers 
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
+	OpenSC smart card library
+	Copyright (C) OpenSC developers 
 
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
+
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 3.) This software contains libtool libltdl3:
 
-Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
-Originally by Thomas Tanner <tanner@ffii.org>
+	Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
+	Originally by Thomas Tanner <tanner@ffii.org>
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
- 
-As a special exception to the GNU Lesser General Public License,
-if you distribute this file as part of a program or library that
-is built using GNU libtool, you may include it under the same
-distribution terms that you use for the rest of that program.
-    
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2 of the License, or (at your option) any later version.
+	 
+	As a special exception to the GNU Lesser General Public License,
+	if you distribute this file as part of a program or library that
+	is built using GNU libtool, you may include it under the same
+	distribution terms that you use for the rest of that program.
+	    
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
 4.) This package includes zlib:
 
-  zlib version 1.2.3
-  available at http://www.gzip.org/zlib/
-  Contributed by Gilles Vollant <info@winimage.com>
-  Compiler: Microsoft Visual C++ Toolkit 2003
-  Library:  Microsoft Visual C++ 6.0  (to link with MSVCRT.DLL)
+	zlib version 1.2.3
+	available at http://www.gzip.org/zlib/
+	Contributed by Gilles Vollant <info@winimage.com>
+	Compiler: Microsoft Visual C++ Toolkit 2003
+	Library:  Microsoft Visual C++ 6.0  (to link with MSVCRT.DLL)
 
- (C) 1995-2005 Jean-loup Gailly and Mark Adler
+	(C) 1995-2005 Jean-loup Gailly and Mark Adler
 
-  This software is provided 'as-is', without any express or implied
-  warranty.  In no event will the authors be held liable for any damages
-  arising from the use of this software.
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
 
-  Permission is granted to anyone to use this software for any purpose,
-  including commercial applications, and to alter it and redistribute it
-  freely, subject to the following restrictions:
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
 
-  1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
-  2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
-  3. This notice may not be removed or altered from any source distribution.
+	1. The origin of this software must not be misrepresented; you must not
+	claim that you wrote the original software. If you use this software
+	in a product, an acknowledgment in the product documentation would be
+	appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
 
-  Jean-loup Gailly        Mark Adler
-  jloup@gzip.org          madler@alumni.caltech.edu
+	Jean-loup Gailly        Mark Adler
+	jloup@gzip.org          madler@alumni.caltech.edu
 
+5.) This package includes lzo:
+
+	Copyright (C) 2005 Markus Franz Xaver Johannes Oberhumer
+	Copyright (C) 2004 Markus Franz Xaver Johannes Oberhumer
+	Copyright (C) 2003 Markus Franz Xaver Johannes Oberhumer
+	Copyright (C) 2002 Markus Franz Xaver Johannes Oberhumer
+	Copyright (C) 2001 Markus Franz Xaver Johannes Oberhumer
+	Copyright (C) 2000 Markus Franz Xaver Johannes Oberhumer
+	Copyright (C) 1999 Markus Franz Xaver Johannes Oberhumer
+	Copyright (C) 1998 Markus Franz Xaver Johannes Oberhumer
+	Copyright (C) 1997 Markus Franz Xaver Johannes Oberhumer
+	Copyright (C) 1996 Markus Franz Xaver Johannes Oberhumer
+	All Rights Reserved.
+
+	The LZO library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License,
+	version 2, as published by the Free Software Foundation.
+
+	The LZO library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with the LZO library; see the file COPYING.
+	If not, write to the Free Software Foundation, Inc.,
+	51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+	Markus F.X.J. Oberhumer
+	<markus@oberhumer.com>
+	http://www.oberhumer.com/opensource/lzo/
+
+6.) This package includes OpenVPN:
+
+	OpenVPN -- An application to securely tunnel IP networks
+		   over a single TCP/UDP port, with support for SSL/TLS-based
+		   session authentication and key exchange,
+		   packet encryption, packet authentication, and
+		   packet compression.
+
+	Copyright (C) 2002-2008 OpenVPN Solutions LLC <info@openvpn.net>
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License version 2
+	as published by the Free Software Foundation.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program (see the file COPYING included with this
+	distribution); if not, write to the Free Software Foundation, Inc.,
+	59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 ================= OPENSSL LICENSE TEXT ================= 
 
