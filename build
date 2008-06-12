@@ -278,9 +278,10 @@ clean_empty_dirs() {
 }
 
 pack() {
-	tar -cjf "${IMAGEROOT}/opensc-mingw32-${BUILD_VERSION}-base.tar.bz2" -C "${OPENSC_ROOT}" .
-	tar -cjf "${IMAGEROOT}/opensc-mingw32-${BUILD_VERSION}-engine_pkcs11.tar.bz2" -C "${ENGINE_PKCS11_ROOT}" .
-	tar -cjf "${IMAGEROOT}/opensc-mingw32-${BUILD_VERSION}-openvpn.tar.bz2" -C "${OPENVPN_ROOT}" .
+	local X="${CHOST:-$(gcc -### 2>&1 | grep Target | sed 's/.* //')}"
+	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-base.tar.bz2" -C "${OPENSC_ROOT}" .
+	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-engine_pkcs11.tar.bz2" -C "${ENGINE_PKCS11_ROOT}" .
+	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-openvpn.tar.bz2" -C "${OPENVPN_ROOT}" .
 }
 
 SCRIPTROOT="$(get_my_dir)"
