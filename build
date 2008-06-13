@@ -140,7 +140,7 @@ build_dep() {
 
 	echo "Build libtool"
 	cd "${BUILDROOT}/libtool"* || die "cd libtool"
-	./configure ${CONFIGOPTS} || die "Configure libtool"
+	./configure ${CONFIGOPTS} ${EXTRA_LIBTOOL_CONFIG} || die "Configure libtool"
 	make ${MAKEOPTS} install DESTDIR="${OPENSC_ROOT}" || die "make opensc"
 	fixup_la
 
@@ -151,6 +151,7 @@ build_dep() {
 		no-zlib shared $(CHOST="${CHOST}" "${SCRIPTROOT}/gentoo.config-0.9.8") \
 		no-capieng \
 		--openssldir=/etc/ssl \
+		${EXTRA_OPENSSL_CONFIG} \
 		|| die "Configure openssl"
 	if [ -n "${BUILD_FOR_WINDOWS}" ]; then
 		perl util/mkdef.pl crypto update
@@ -176,7 +177,7 @@ build_opensc() {
 
 		echo "Build openct"
 		cd "${BUILDROOT}/openct"* || die "cd openct"
-		./configure ${CONFIGOPTS} \
+		./configure ${CONFIGOPTS} ${EXTRA_OPENCT_CONFIG} \
 			${extra_opensc} --enable-doc \
 			|| die "Configure openct"
 		make ${MAKEOPTS} install DESTDIR="${OPENSC_ROOT}" || die "make openct"
@@ -186,7 +187,7 @@ build_opensc() {
 
 	echo "Build opensc"
 	cd "${BUILDROOT}/opensc"* || die "cd opensc"
-	./configure ${CONFIGOPTS} \
+	./configure ${CONFIGOPTS} ${EXTRA_OPENSC_CONFIG} \
 		--enable-openssl --enable-zlib ${extra_opensc} --enable-doc \
 		|| die "Configure opensc"
 	make ${MAKEOPTS} install DESTDIR="${OPENSC_ROOT}" || die "make opensc"
@@ -203,7 +204,7 @@ build_engine_pkcs11() {
 
 	echo "Build libp11"
 	cd "${BUILDROOT}/libp11"* || die "cd libp11"
-	./configure ${CONFIGOPTS} \
+	./configure ${CONFIGOPTS} ${EXTRA_LIBP11_CONFIG} \
 		--enable-doc \
 		|| die "Configure libp11"
 	make ${MAKEOPTS} install DESTDIR="${ENGINE_PKCS11_ROOT}" || die "make libp11"
@@ -212,7 +213,7 @@ build_engine_pkcs11() {
 
 	echo "Build engine_pkcs11"
 	cd "${BUILDROOT}/engine_pkcs11"* || die "cd engine_pkcs11"
-	./configure ${CONFIGOPTS} \
+	./configure ${CONFIGOPTS} ${EXTRA_ENGINE_PKCS11_CONFIG} \
 		--enable-doc \
 		--with-enginesdir="/lib/engines" \
 		|| die "Configure engine_pkcs11"
@@ -230,7 +231,7 @@ build_openvpn() {
 
 	echo "Build lzo"
 	cd "${BUILDROOT}/lzo"* || die "cd lzo"
-	./configure ${CONFIGOPTS} \
+	./configure ${CONFIGOPTS} ${EXTRA_LZO_CONFIG} \
 		|| die "Configure lzo"
 	make ${MAKEOPTS} install DESTDIR="${OPENVPN_ROOT}" || die "make lzo"
 
@@ -238,7 +239,7 @@ build_openvpn() {
 
 	echo "Build pkcs11-helper"
 	cd "${BUILDROOT}/pkcs11-helper"* || die "cd pkcs11-helper"
-	./configure ${CONFIGOPTS} \
+	./configure ${CONFIGOPTS} ${EXTRA_PKCS11_HELPER_CONFIG} \
 		--disable-crypto-engine-gnutls \
 		--disable-crypto-engine-nss \
 		|| die "Configure pkcs11-helper"
@@ -248,7 +249,7 @@ build_openvpn() {
 
 	echo "Build openvpn"
 	cd "${BUILDROOT}/openvpn"* || die "cd openvpn"
-	./configure ${CONFIGOPTS} \
+	./configure ${CONFIGOPTS} ${EXTRA_OPENVPN_CONFIG} \
 		CPPFLAGS="-I${OPENSC_ROOT}/include -I${OPENVPN_ROOT}/include" \
 		LDFLAGS="-L${OPENSC_ROOT}/lib -L${OPENVPN_ROOT}/lib" \
 		|| die "Configure openvpn"
@@ -285,10 +286,6 @@ pack() {
 
 SCRIPTROOT="$(get_my_dir)"
 
-BUILD_VERSION="0.0.1"
-WGET="${WGET:-wget}"
-#WGET_OPTS
-MAKEOPTS="${MAKEOPTS:--j2}"
 #CHOST
 #CTARGET
 CBUILD="${CBUILD:-${CHOST}}"
@@ -296,7 +293,7 @@ IMAGEROOT="${IMAGEROOT:-${SCRIPTROOT}/image}"
 BUILDROOT="${BUILDROOT:-${SCRIPTROOT}/tmp}"
 DISTDIR="${DISTDIR:-${SCRIPTROOT}/distfiles}"
 PATCHDIR="${SCRIPTROOT}/patches"
-echo "${CHOST}" | grep "mingw" > /dev/null && BUILD_FOR_WINDOWS=1
+echo "${CHOST:-$(gcc -### 2>&1 | grep Target | sed 's/.* //')}" | grep mingw > /dev/null && BUILD_FOR_WINDOWS=1
 
 CONFIGOPTS=" \
 	--prefix=/ \
@@ -307,7 +304,7 @@ CONFIGOPTS=" \
 	--program-prefix='' \
 "
 
-. "${SCRIPTROOT}/fetch.versions" || die "Cannot source versions"
+. "${SCRIPTROOT}/build.vars" || die "Cannot source build.vars"
 
 OPENSC_ROOT="${IMAGEROOT}/opensc"
 ENGINE_PKCS11_ROOT="${IMAGEROOT}/engine_pkcs11"
