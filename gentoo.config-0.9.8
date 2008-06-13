@@ -11,6 +11,7 @@
 
 #@ALON: Add mingw support
 
+CHOST="${CHOST:-$(gcc -### 2>&1 | grep Target | sed 's/.* //')}"
 
 # Testing routines
 if [[ $1 == "test" ]] ; then
