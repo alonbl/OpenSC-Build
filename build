@@ -68,16 +68,16 @@ download1() {
 	local url="$1"
 	local prefix="$(basename "${url}" | sed 's/-.*//g')"
 
-	if ! [ -n "$(ls "${DISTDIR}/${prefix}"* 2> /dev/null)" ]; then
-		"${WGET}" ${WGET_OPTS} --directory-prefix="${DISTDIR}" \
+	if ! [ -n "$(ls "${SOURCESROOT}/${prefix}"* 2> /dev/null)" ]; then
+		"${WGET}" ${WGET_OPTS} --directory-prefix="${SOURCESROOT}" \
 			"${url}" \
 			|| die "Cannot download ${url}"
 	fi
 }
 
 download() {
-	if ! [ -e "${DISTDIR}" ]; then
-		mkdir -p "${DISTDIR}" || die "Cannot create '${DISTDIR}'"
+	if ! [ -e "${SOURCESROOT}" ]; then
+		mkdir -p "${SOURCESROOT}" || die "Cannot create '${SOURCESROOT}'"
 	fi
 	download1 "http://www.zlib.net/zlib-${ZLIB_VERSION}.tar.gz"
 	download1 "http://www.oberhumer.com/opensource/lzo/download/lzo-${LZO_VERSION}.tar.gz"
@@ -90,8 +90,8 @@ download() {
 	download1 "http://www.opensc-project.org/files/pkcs11-helper/pkcs11-helper-${PKCS11_HELPER_VERSION}.tar.bz2"
 	download1 "https://secure.openvpn.net/beta/openvpn-${OPENVPN_VERSION}.tar.gz"
 
-	if [ "$(ls "${DISTDIR}" | wc -l | sed 's/[ \t]//g')" != 10 ]; then
-		die "distfiles is unclean."
+	if [ "$(ls "${SOURCESROOT}" | wc -l | sed 's/[ \t]//g')" != 10 ]; then
+		die "sources is unclean."
 	fi
 }
 
@@ -106,7 +106,7 @@ create_layout() {
 extract() {
 	local f
 
-	for f in "${DISTDIR}"/*; do
+	for f in "${SOURCESROOT}"/*; do
 		local extra=""
 		echo "Extract '$f'"
 		echo "$f" | grep -q '\.bz2' && extra="${extra}j"
@@ -267,13 +267,13 @@ copy_docs() {
 	echo "Copying documents"
 	mkdir -p "${OPENSC_ROOT}/share/doc/package"
 	cp "${SCRIPTROOT}/README" "${SCRIPTROOT}/COPYING"* "${OPENSC_ROOT}/share/doc/package" || die "package docs"
-	ls "${DISTDIR}" > "${OPENSC_ROOT}/share/doc/package/components.lst" || die "components.lst"
+	ls "${SOURCESROOT}" > "${OPENSC_ROOT}/share/doc/package/components.lst" || die "components.lst"
 }
 
 copy_sources() {
 	echo "Copying sources"
 	mkdir -p "${IMAGEROOT}/src/patches"
-	cp "${DISTDIR}"/* "${IMAGEROOT}/src" || die "sources"
+	cp "${SOURCESROOT}"/* "${IMAGEROOT}/src" || die "sources"
 	cp "${PATCHDIR}"/* "${IMAGEROOT}/src/patches" || die "patches"
 }
 
@@ -297,7 +297,7 @@ SCRIPTROOT="$(get_my_dir)"
 CBUILD="${CBUILD:-${CHOST}}"
 IMAGEROOT="${IMAGEROOT:-${SCRIPTROOT}/image}"
 BUILDROOT="${BUILDROOT:-${SCRIPTROOT}/tmp}"
-DISTDIR="${DISTDIR:-${SCRIPTROOT}/distfiles}"
+SOURCESROOT="${SOURCESROOT:-${SCRIPTROOT}/sources}"
 PATCHDIR="${SCRIPTROOT}/patches"
 echo "${CHOST:-$(gcc -dumpmachine)}" | grep mingw > /dev/null && BUILD_FOR_WINDOWS=1
 
