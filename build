@@ -48,7 +48,7 @@ fixup_la() {
 
 	echo "Fixup libtool files"
 	for f in "${IMAGEROOT}/"*"/lib"/*.la; do
-		sed 's#//#'"$(dirname $(dirname "$f"))"'/#g' "${f}" > "${f}.tmp"
+		sed 's#//#'"$(dirname "$(dirname "$(echo "${f}" | sed 's#//#/#g')")")"'/#g' "${f}" > "${f}.tmp"
 		mv "${f}.tmp" "${f}"
 	done
 }
@@ -58,7 +58,8 @@ restore_la() {
 
 	echo "Restore libtool files"
 	for f in "${IMAGEROOT}/"*"/lib"/*.la; do
-		sed 's#'"${IMAGEROOT}"'/[^/]*/lib#//lib#g' "${f}" > "${f}.tmp"
+		local x="$(echo "${IMAGEROOT}" | sed 's#/$##')"
+		sed 's#'"${x}"'/[^/]*/lib#//lib#g' "${f}" > "${f}.tmp"
 		mv "${f}.tmp" "${f}"
 	done
 }
@@ -87,7 +88,7 @@ download() {
 	download1 "http://www.opensc-project.org/files/libp11/libp11-${LIP11_VERSION}.tar.gz"
 	download1 "http://www.opensc-project.org/files/engine_pkcs11/engine_pkcs11-${ENGINE_PKCS11_VERSION}.tar.gz"
 	download1 "http://www.opensc-project.org/files/pkcs11-helper/pkcs11-helper-${PKCS11_HELPER_VERSION}.tar.bz2"
-	download1 "http://openvpn.net/release/openvpn-${OPENVPN_VERSION}.tar.gz"
+	download1 "https://secure.openvpn.net/beta/openvpn-${OPENVPN_VERSION}.tar.gz"
 
 	if [ "$(ls "${DISTDIR}" | wc -l | sed 's/[ \t]//g')" != 10 ]; then
 		die "distfiles is unclean."
@@ -155,6 +156,7 @@ build_dep() {
 		|| die "Configure openssl"
 	if [ -n "${BUILD_FOR_WINDOWS}" ]; then
 		perl util/mkdef.pl crypto update
+		perl util/mkdef.pl ssl update
 	fi
 	make depend install INSTALL_PREFIX="${OPENSC_ROOT}" INSTALLTOP="/" MANDIR="/tmp" \
 		|| die "make openssl"
@@ -262,23 +264,27 @@ build_openvpn() {
 }
 
 copy_docs() {
+	echo "Copying documents"
 	mkdir -p "${OPENSC_ROOT}/share/doc/package"
 	cp "${SCRIPTROOT}/README" "${SCRIPTROOT}/COPYING"* "${OPENSC_ROOT}/share/doc/package" || die "package docs"
 	ls "${DISTDIR}" > "${OPENSC_ROOT}/share/doc/package/components.lst" || die "components.lst"
 }
 
 copy_sources() {
+	echo "Copying sources"
 	mkdir -p "${IMAGEROOT}/src/patches"
 	cp "${DISTDIR}"/* "${IMAGEROOT}/src" || die "sources"
 	cp "${PATCHDIR}"/* "${IMAGEROOT}/src/patches" || die "patches"
 }
 
 clean_empty_dirs() {
+	echo "Cleaning empty directories"
 	find "${IMAGEROOT}" -type d | sort -r | xargs rmdir 2> /dev/null
 }
 
 pack() {
-	local X="${CHOST:-$(gcc -### 2>&1 | grep Target | sed 's/.* //')}"
+	echo "Packing images"
+	local X="${CHOST:-$(gcc -dumpmachine)}"
 	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-base.tar.bz2" -C "${OPENSC_ROOT}" .
 	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-engine_pkcs11.tar.bz2" -C "${ENGINE_PKCS11_ROOT}" .
 	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-openvpn.tar.bz2" -C "${OPENVPN_ROOT}" .
@@ -293,7 +299,7 @@ IMAGEROOT="${IMAGEROOT:-${SCRIPTROOT}/image}"
 BUILDROOT="${BUILDROOT:-${SCRIPTROOT}/tmp}"
 DISTDIR="${DISTDIR:-${SCRIPTROOT}/distfiles}"
 PATCHDIR="${SCRIPTROOT}/patches"
-echo "${CHOST:-$(gcc -### 2>&1 | grep Target | sed 's/.* //')}" | grep mingw > /dev/null && BUILD_FOR_WINDOWS=1
+echo "${CHOST:-$(gcc -dumpmachine)}" | grep mingw > /dev/null && BUILD_FOR_WINDOWS=1
 
 CONFIGOPTS=" \
 	--prefix=/ \

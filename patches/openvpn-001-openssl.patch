@@ -1,0 +1,20 @@
+--- a/configure	2008-06-13 18:35:26.000000000 +0300
++++ b/configure	2008-06-13 18:35:49.000000000 +0300
+@@ -11361,7 +11361,7 @@ _ACEOF
+ 
+                        if test "${WIN32}" = "yes"; then
+ 
+-  LIBS="-leay32 $LIBS"
++  LIBS="-lcrypto $LIBS"
+ 
+                        else
+ 
+@@ -12219,7 +12219,7 @@ _ACEOF
+ 
+       if test "${WIN32}" = "yes"; then
+ 
+-  LIBS="-lssl32 $LIBS"
++  LIBS="-lssl $LIBS"
+ 
+       else
+ 

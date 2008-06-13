@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Copyright 1999-2005 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/dev-libs/openssl/files/gentoo.config-0.9.8,v 1.16 2007/04/01 11:03:52 vapier Exp $
@@ -10,11 +10,13 @@
 # we can pass to the 'Configure' script.
 
 #@ALON: Add mingw support
+#@ALON: Remove bash so we can work on msys
+#@ALON: Set CHOST if missing
 
-CHOST="${CHOST:-$(gcc -### 2>&1 | grep Target | sed 's/.* //')}"
+CHOST="${CHOST:-$(gcc -dumpmachine)}"
 
 # Testing routines
-if [[ $1 == "test" ]] ; then
+if [ "$1" = "test" ] ; then
 	for c in \
 		"arm-gentoo-linux-uclibc      |linux-generic32 -DL_ENDIAN" \
 		"armv5b-linux-gnu             |linux-generic32 -DB_ENDIAN" \
@@ -34,7 +36,7 @@ if [[ $1 == "test" ]] ; then
 		ret_want=${c/*|}
 		ret_got=$(CHOST=${CHOST} "$0")
 
-		if [[ ${ret_want} == "${ret_got}" ]] ; then
+		if [ ${ret_want} = "${ret_got}" ] ; then
 			echo "PASS: ${CHOST}"
 		else
 			echo "FAIL: ${CHOST}"
@@ -44,12 +46,12 @@ if [[ $1 == "test" ]] ; then
 	done
 	exit 0
 fi
-[[ -z ${CHOST} && -n $1 ]] && CHOST=$1
+[ -z ${CHOST} -a -n "$1" ] && CHOST="$1"
 
 
 # Detect the operating system
 case ${CHOST} in
-	*-mingw*)    system="mingw";;
+	*-mingw*|mingw*)    system="mingw";;
 	*-linux*)    system="linux";;
 	*-freebsd*)  system="BSD";;
 	*)           exit 0;;
@@ -58,8 +60,8 @@ esac
 
 # Compiler munging
 compiler="gcc"
-if [[ ${CC} == "ccc" ]] ; then
-	compiler=${CC}
+if [ "${CC}" = "ccc" ] ; then
+	compiler="${CC}"
 fi
 
 
@@ -108,6 +110,6 @@ esac
 
 
 # If we have something, show it
-if [ -n "${system}"  ]; then
+if [ -n "${system}" ]; then
 	[ -n "${machine}" ] && echo ${system}-${machine} || echo ${system}
 fi
