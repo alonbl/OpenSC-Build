@@ -254,6 +254,7 @@ build_openvpn() {
 	./configure ${CONFIGOPTS} ${EXTRA_OPENVPN_CONFIG} \
 		CPPFLAGS="-I${OPENSC_ROOT}/include -I${OPENVPN_ROOT}/include" \
 		LDFLAGS="-L${OPENSC_ROOT}/lib -L${OPENVPN_ROOT}/lib" \
+		OPENSSL_LIBS="${OPENSSL_FULL_LIBS}" \
 		|| die "Configure openvpn"
 	make ${MAKEOPTS} install DESTDIR="${OPENVPN_ROOT}" || die "make openvpn"
 
@@ -322,10 +323,15 @@ export ZLIB_CFLAGS="${LTLIB_CFLAGS}"
 export ZLIB_LIBS="-L${OPENSC_ROOT}/lib -lz"
 export OPENSSL_CFLAGS="${LTLIB_CFLAGS}"
 export OPENSSL_LIBS="-L${OPENSC_ROOT}/lib -lcrypto"
+export OPENSSL_FULL_LIBS="-L${OPENSC_ROOT}/lib -lssl -lcrypto"
 export OPENCT_CFLAGS="${LTLIB_CFLAGS}"
 export OPENCT_LIBS="-L${OPENSC_ROOT}/lib -lopenct"
 export LIBP11_CFLAGS="-I${ENGINE_PKCS11_ROOT}/include"
 export LIBP11_LIBS="-L${ENGINE_PKCS11_ROOT}/lib -lp11"
+export LZO_CFLAGS="-I${OPENVPN_ROOT}/include"
+export LZO_LIBS="-L${OPENVPN_ROOT}/lib -llzo2"
+export PKCS11_HELPER_CFLAGS="-I${OPENVPN_ROOT}/include"
+export PKCS11_HELPER_LIBS="-L${OPENVPN_ROOT}/lib -lpkcs11-helper"
 
 if [ -n "${BUILD_FOR_WINDOWS}" ]; then
 	OPENSC_COMPONENTS="pcsc"
