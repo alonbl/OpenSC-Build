@@ -127,7 +127,7 @@ build_dep() {
 	echo "Build zlib"
 	cd "${BUILDROOT}/zlib"* || die "cd zlib"
 	if [ -n "${BUILD_FOR_WINDOWS}" ]; then
-		make -f win32/Makefile.gcc \
+		${MAKE} -f win32/Makefile.gcc \
 			PREFIX=${CHOST:+${CHOST}-} \
 			INCLUDE_PATH="${OPENSC_ROOT}/include" \
 			LIBRARY_PATH="${OPENSC_ROOT}/lib" \
@@ -136,13 +136,13 @@ build_dep() {
 			die "make zlib"
 	else
 		CHOST="${CHOST}" LDCONFIG=true ./configure --shared --prefix=/ || die "configure zlib"
-		make install DESTDIR="${OPENSC_ROOT}" || die "make zlib"
+		${MAKE} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${OPENSC_ROOT}" || die "make zlib"
 	fi
 
 	echo "Build libtool"
 	cd "${BUILDROOT}/libtool"* || die "cd libtool"
 	./configure ${CONFIGOPTS} ${EXTRA_LIBTOOL_CONFIG} || die "Configure libtool"
-	make ${MAKEOPTS} install DESTDIR="${OPENSC_ROOT}" || die "make opensc"
+	${MAKE} ${MAKEOPTS} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${OPENSC_ROOT}" || die "make opensc"
 	fixup_la
 
 	echo "Build openssl"
@@ -158,7 +158,7 @@ build_dep() {
 		perl util/mkdef.pl crypto update
 		perl util/mkdef.pl ssl update
 	fi
-	make depend install INSTALL_PREFIX="${OPENSC_ROOT}" INSTALLTOP="/" MANDIR="/tmp" \
+	${MAKE} depend install INSTALL_PREFIX="${OPENSC_ROOT}" INSTALLTOP="/" MANDIR="/tmp" \
 		|| die "make openssl"
 	rm -fr "${OPENSC_ROOT}/tmp"
 
@@ -182,7 +182,7 @@ build_opensc() {
 		./configure ${CONFIGOPTS} ${EXTRA_OPENCT_CONFIG} \
 			${extra_opensc} --enable-doc \
 			|| die "Configure openct"
-		make ${MAKEOPTS} install DESTDIR="${OPENSC_ROOT}" || die "make openct"
+		${MAKE} ${MAKEOPTS} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${OPENSC_ROOT}" || die "make openct"
 
 		fixup_la
 	fi
@@ -192,7 +192,7 @@ build_opensc() {
 	./configure ${CONFIGOPTS} ${EXTRA_OPENSC_CONFIG} \
 		--enable-openssl --enable-zlib ${extra_opensc} --enable-doc \
 		|| die "Configure opensc"
-	make ${MAKEOPTS} install DESTDIR="${OPENSC_ROOT}" || die "make opensc"
+	${MAKE} ${MAKEOPTS} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${OPENSC_ROOT}" || die "make opensc"
 
 	fixup_la
 
@@ -209,7 +209,7 @@ build_engine_pkcs11() {
 	./configure ${CONFIGOPTS} ${EXTRA_LIBP11_CONFIG} \
 		--enable-doc \
 		|| die "Configure libp11"
-	make ${MAKEOPTS} install DESTDIR="${ENGINE_PKCS11_ROOT}" || die "make libp11"
+	${MAKE} ${MAKEOPTS} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${ENGINE_PKCS11_ROOT}" || die "make libp11"
 
 	fixup_la
 
@@ -219,7 +219,7 @@ build_engine_pkcs11() {
 		--enable-doc \
 		--with-enginesdir="/lib/engines" \
 		|| die "Configure engine_pkcs11"
-	make ${MAKEOPTS} install DESTDIR="${ENGINE_PKCS11_ROOT}" || die "make engine_pkcs11"
+	${MAKE} ${MAKEOPTS} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${ENGINE_PKCS11_ROOT}" || die "make engine_pkcs11"
 
 	fixup_la
 
@@ -235,7 +235,7 @@ build_openvpn() {
 	cd "${BUILDROOT}/lzo"* || die "cd lzo"
 	./configure ${CONFIGOPTS} ${EXTRA_LZO_CONFIG} \
 		|| die "Configure lzo"
-	make ${MAKEOPTS} install DESTDIR="${OPENVPN_ROOT}" || die "make lzo"
+	${MAKE} ${MAKEOPTS} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${OPENVPN_ROOT}" || die "make lzo"
 
 	fixup_la
 
@@ -245,7 +245,7 @@ build_openvpn() {
 		--disable-crypto-engine-gnutls \
 		--disable-crypto-engine-nss \
 		|| die "Configure pkcs11-helper"
-	make ${MAKEOPTS} install DESTDIR="${OPENVPN_ROOT}" || die "make pkcs11-helper"
+	${MAKE} ${MAKEOPTS} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${OPENVPN_ROOT}" || die "make pkcs11-helper"
 
 	fixup_la
 
@@ -256,7 +256,7 @@ build_openvpn() {
 		LDFLAGS="-L${OPENSC_ROOT}/lib -L${OPENVPN_ROOT}/lib" \
 		OPENSSL_LIBS="${OPENSSL_FULL_LIBS}" \
 		|| die "Configure openvpn"
-	make ${MAKEOPTS} install DESTDIR="${OPENVPN_ROOT}" || die "make openvpn"
+	${MAKE} ${MAKEOPTS} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${OPENVPN_ROOT}" || die "make openvpn"
 
 	fixup_la
 
@@ -316,6 +316,12 @@ CONFIGOPTS=" \
 OPENSC_ROOT="${IMAGEROOT}/opensc"
 ENGINE_PKCS11_ROOT="${IMAGEROOT}/engine_pkcs11"
 OPENVPN_ROOT="${IMAGEROOT}/openvpn"
+
+if [ "${DO_STRIP}" = "1" ]; then
+	MAKE_AUTOCONF_INSTALL_TARGET="install-strip"
+else
+	MAKE_AUTOCONF_INSTALL_TARGET="install"
+fi
 
 export LTLIB_CFLAGS="-I${OPENSC_ROOT}/include"
 export LTLIB_LIBS="-L${OPENSC_ROOT}/lib -lltdl"
