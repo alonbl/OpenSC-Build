@@ -268,7 +268,6 @@ copy_docs() {
 	echo "Copying documents"
 	mkdir -p "${OPENSC_ROOT}/share/doc/package"
 	cp "${SCRIPTROOT}/README" "${SCRIPTROOT}/COPYING"* "${OPENSC_ROOT}/share/doc/package" || die "package docs"
-	ls "${SOURCESROOT}" > "${OPENSC_ROOT}/share/doc/package/components.lst" || die "components.lst"
 }
 
 copy_sources() {
@@ -286,9 +285,11 @@ clean_empty_dirs() {
 pack() {
 	echo "Packing images"
 	local X="${CHOST:-$(gcc -dumpmachine)}"
-	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-base.tar.bz2" -C "${OPENSC_ROOT}" .
-	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-engine_pkcs11.tar.bz2" -C "${ENGINE_PKCS11_ROOT}" .
-	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-openvpn.tar.bz2" -C "${OPENVPN_ROOT}" .
+	(cd ../../windows.old/trunk/image && find src ) | bzip2 > "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-srclist.bz2" || die "srclist"
+	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-src.tar.bz2" -C "${IMAGEROOT}" src || die "src"
+	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-base.tar.bz2" -C "${OPENSC_ROOT}" . || die "base"
+	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-engine_pkcs11.tar.bz2" -C "${ENGINE_PKCS11_ROOT}" . || die "engine_pkcs11"
+	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-openvpn.tar.bz2" -C "${OPENVPN_ROOT}" . || die "openvpn"
 }
 
 SCRIPTROOT="$(get_my_dir)"
