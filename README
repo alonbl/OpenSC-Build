@@ -11,7 +11,7 @@ About
 
 Versions
 
-	The tarballs are taken from "DISTDIR" directory, the
+	The tarballs are taken from "SOURCEROOT" directory, the
 	version is not forced. If tarball is missing it is
 	downloaded from its site using a specific version.
 
