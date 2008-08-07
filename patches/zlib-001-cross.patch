@@ -4,13 +4,13 @@
  # If you have problems, try without defining CC and CFLAGS before reporting
  # an error.
  
-+if [ -n "$CHOS}" ]; then
-+	system="$(echo "$CHOST" | sed 's/.*-.*-\(.*\)-.*/\1/')"
-+	arch="$(echo "$CHOST" | sed 's/-.*//')"
-+	CROSS_PREFIX="$CHOST-"
++if [ -n "${CHOST}" ]; then
++	system="$(echo "${CHOST}" | sed 's/.*-.*-\(.*\)-.*/\1/')"
++	arch="$(echo "${CHOST}" | sed 's/-.*//')"
++	CROSS_PREFIX="${CHOST}-"
 +else
-+	system=`uname -s 2> /dev/null || echo unknown)`
-+	arch=`uname -m 2> /dev/null || echo unknown)`
++	system=`(uname -s 2> /dev/null || echo unknown)`
++	arch=`(uname -m 2> /dev/null || echo unknown)`
 +fi
 +
  LIBS=libz.a
