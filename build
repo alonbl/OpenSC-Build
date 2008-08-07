@@ -135,8 +135,9 @@ build_dep() {
 			install || \
 			die "make zlib"
 	else
-		CHOST="${CHOST}" LDCONFIG=true ./configure --shared --prefix=/ || die "configure zlib"
-		${MAKE} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${OPENSC_ROOT}" || die "make zlib"
+		CHOST="${CHOST}" LDCONFIG=true CFLAGS="${CFLAGS} -fPIC -fpic -s" \
+			./configure --shared --prefix=/ || die "configure zlib"
+		${MAKE} install DESTDIR="${OPENSC_ROOT}" || die "make zlib"
 	fi
 
 	echo "Build libtool"
