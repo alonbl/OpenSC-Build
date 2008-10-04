@@ -88,7 +88,7 @@ download() {
 	download1 "http://www.opensc-project.org/files/libp11/libp11-${LIP11_VERSION}.tar.gz"
 	download1 "http://www.opensc-project.org/files/engine_pkcs11/engine_pkcs11-${ENGINE_PKCS11_VERSION}.tar.gz"
 	download1 "http://www.opensc-project.org/files/pkcs11-helper/pkcs11-helper-${PKCS11_HELPER_VERSION}.tar.bz2"
-	download1 "https://secure.openvpn.net/beta/openvpn-${OPENVPN_VERSION}.tar.gz"
+	download1 "http://openvpn.net/release/openvpn-${OPENVPN_VERSION}.tar.gz"
 
 	if [ "$(ls "${SOURCESROOT}" | wc -l | sed 's/[ \t]//g')" != 10 ]; then
 		die "sources is unclean."
@@ -286,7 +286,7 @@ clean_empty_dirs() {
 pack() {
 	echo "Packing images"
 	local X="${CHOST:-$(gcc -dumpmachine)}"
-	(cd ../../windows.old/trunk/image && find src ) | bzip2 > "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-srclist.bz2" || die "srclist"
+	(cd "${IMAGEROOT}" && find src ) | bzip2 > "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-srclist.bz2" || die "srclist"
 	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-src.tar.bz2" -C "${IMAGEROOT}" src || die "src"
 	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-base.tar.bz2" -C "${OPENSC_ROOT}" . || die "base"
 	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-engine_pkcs11.tar.bz2" -C "${ENGINE_PKCS11_ROOT}" . || die "engine_pkcs11"

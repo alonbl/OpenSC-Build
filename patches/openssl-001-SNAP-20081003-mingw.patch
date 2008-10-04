@@ -1,0 +1,31 @@
+
+The depend use native CC and not cross compile, so mingw flags
+are not accepted.
+
+_XOPEN_SOURCE cannot be used in mingw, strptime is never used anyway?
+
+---
+
+diff -urNp openssl-SNAP-20081003.org/ssl/kssl.c openssl-SNAP-20081003/ssl/kssl.c
+--- openssl-SNAP-20081003.org/ssl/kssl.c	2007-02-10 13:00:54.000000000 +0200
++++ openssl-SNAP-20081003/ssl/kssl.c	2008-10-04 21:30:51.000000000 +0300
+@@ -68,7 +68,6 @@
+ 
+ #include <openssl/opensslconf.h>
+ 
+-#define _XOPEN_SOURCE 500 /* glibc2 needs this to declare strptime() */
+ #include <time.h>
+ #if 0 /* Experimental */
+ #undef _XOPEN_SOURCE /* To avoid clashes with anything else... */
+diff -urNp openssl-SNAP-20081003.org/util/domd openssl-SNAP-20081003/util/domd
+--- openssl-SNAP-20081003.org/util/domd	2008-09-09 23:00:21.000000000 +0300
++++ openssl-SNAP-20081003/util/domd	2008-10-04 21:29:05.000000000 +0300
+@@ -22,7 +22,7 @@ if [ "$MAKEDEPEND" = "gcc" ]; then
+     done
+     sed -e '/^# DO NOT DELETE.*/,$d' < Makefile > Makefile.tmp
+     echo '# DO NOT DELETE THIS LINE -- make depend depends on it.' >> Makefile.tmp
+-    gcc -Werror -D OPENSSL_DOING_MAKEDEPEND -M $args >> Makefile.tmp || exit
++    gcc -D OPENSSL_DOING_MAKEDEPEND -M $args >> Makefile.tmp
+     ${PERL} $TOP/util/clean-depend.pl < Makefile.tmp > Makefile.new
+     rm -f Makefile.tmp
+ else
