@@ -1,0 +1,40 @@
+
+Fixup name conflict with some mingw versions.
+
+---
+
+diff -urNp openvpn-2.1_rc12.org/cryptoapi.c openvpn-2.1_rc12/cryptoapi.c
+--- openvpn-2.1_rc12.org/cryptoapi.c	2008-08-10 21:35:25.000000000 +0300
++++ openvpn-2.1_rc12/cryptoapi.c	2008-10-04 22:43:05.000000000 +0300
+@@ -51,7 +51,7 @@
+ #define CERT_STORE_OPEN_EXISTING_FLAG 0x00004000
+ #define CRYPT_ACQUIRE_COMPARE_KEY_FLAG 0x00000004
+ static HINSTANCE crypt32dll = NULL;
+-static BOOL WINAPI (*CryptAcquireCertificatePrivateKey) (PCCERT_CONTEXT pCert, DWORD dwFlags,
++static BOOL WINAPI (*my_CryptAcquireCertificatePrivateKey) (PCCERT_CONTEXT pCert, DWORD dwFlags,
+     void *pvReserved, HCRYPTPROV *phCryptProv, DWORD *pdwKeySpec, BOOL *pfCallerFreeProv) = NULL;
+ #endif
+ 
+@@ -387,16 +387,18 @@ int SSL_CTX_use_CryptoAPI_certificate(SS
+ 	    goto err;
+ 	}
+     }
+-    if (CryptAcquireCertificatePrivateKey == NULL) {
+-	CryptAcquireCertificatePrivateKey = GetProcAddress(crypt32dll,
++    if (my_CryptAcquireCertificatePrivateKey == NULL) {
++	my_CryptAcquireCertificatePrivateKey = GetProcAddress(crypt32dll,
+ 		"CryptAcquireCertificatePrivateKey");
+-	if (CryptAcquireCertificatePrivateKey == NULL) {
++	if (my_CryptAcquireCertificatePrivateKey == NULL) {
+ 	    CRYPTOAPIerr(CRYPTOAPI_F_GET_PROC_ADDRESS);
+ 	    goto err;
+ 	}
+     }
++#else
++    my_CryptAcquireCertificatePrivateKey = CryptAcquireCertificatePrivateKey;
+ #endif
+-    if (!CryptAcquireCertificatePrivateKey(cd->cert_context, CRYPT_ACQUIRE_COMPARE_KEY_FLAG,
++    if (!my_CryptAcquireCertificatePrivateKey(cd->cert_context, CRYPT_ACQUIRE_COMPARE_KEY_FLAG,
+ 	    NULL, &cd->crypt_prov, &cd->key_spec, &cd->free_crypt_prov)) {
+ 	/* if we don't have a smart card reader here, and we try to access a
+ 	 * smart card certificate, we get:
