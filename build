@@ -79,16 +79,13 @@ download() {
 	if ! [ -e "${SOURCESROOT}" ]; then
 		mkdir -p "${SOURCESROOT}" || die "Cannot create '${SOURCESROOT}'"
 	fi
-	download1 "http://www.zlib.net/zlib-${ZLIB_VERSION}.tar.gz"
-	download1 "http://www.oberhumer.com/opensource/lzo/download/lzo-${LZO_VERSION}.tar.gz"
-	download1 "http://ftp.gnu.org/gnu/libtool/libtool-${LIBTOOL_VERSION}.tar.gz"
-	download1 "http://mirrors.usc.edu/pub/openssl/snapshot/openssl-${OPENSSL_VERSION}.tar.gz"
-	download1 "http://www.opensc-project.org/files/openct/openct-${OPENCT_VERSION}.tar.gz"
-	download1 "http://www.opensc-project.org/files/opensc/opensc-${OPENSC_VERSION}.tar.gz"
-	download1 "http://www.opensc-project.org/files/libp11/libp11-${LIP11_VERSION}.tar.gz"
-	download1 "http://www.opensc-project.org/files/engine_pkcs11/engine_pkcs11-${ENGINE_PKCS11_VERSION}.tar.gz"
-	download1 "http://www.opensc-project.org/files/pkcs11-helper/pkcs11-helper-${PKCS11_HELPER_VERSION}.tar.bz2"
-	download1 "http://openvpn.net/release/openvpn-${OPENVPN_VERSION}.tar.gz"
+
+	for url in \
+		${ZLIB_URL} ${LZO_URL} ${LIBTOOL_URL} ${OPENSSL_URL} \
+		${OPENCT_URL} ${OPENSC_URL} ${LIBP11_URL} ${ENGINE_PKCS11_URL} \
+		${PKCS11_HELPER_URL} ${OPENVPN_URL}; do
+		download1 "${url}"
+	done
 
 	if [ "$(ls "${SOURCESROOT}" | wc -l | sed 's/[ \t]//g')" != 10 ]; then
 		die "sources is unclean."
