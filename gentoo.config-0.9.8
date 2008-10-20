@@ -51,7 +51,8 @@ fi
 
 # Detect the operating system
 case ${CHOST} in
-	*-mingw*|mingw*)    system="mingw";;
+	i*86-*-mingw*|mingw*)	system="mingw";;
+	x86_64-*-mingw*)	system="mingw64";;
 	*-linux*)    system="linux";;
 	*-freebsd*)  system="BSD";;
 	*)           exit 0;;

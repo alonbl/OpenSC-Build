@@ -11,9 +11,10 @@ diff -urNp openvpn-2.1_rc12.org/cryptoapi.c openvpn-2.1_rc12/cryptoapi.c
  #define CRYPT_ACQUIRE_COMPARE_KEY_FLAG 0x00000004
  static HINSTANCE crypt32dll = NULL;
 -static BOOL WINAPI (*CryptAcquireCertificatePrivateKey) (PCCERT_CONTEXT pCert, DWORD dwFlags,
-+static BOOL WINAPI (*my_CryptAcquireCertificatePrivateKey) (PCCERT_CONTEXT pCert, DWORD dwFlags,
-     void *pvReserved, HCRYPTPROV *phCryptProv, DWORD *pdwKeySpec, BOOL *pfCallerFreeProv) = NULL;
+-    void *pvReserved, HCRYPTPROV *phCryptProv, DWORD *pdwKeySpec, BOOL *pfCallerFreeProv) = NULL;
  #endif
++static BOOL WINAPI (*my_CryptAcquireCertificatePrivateKey) (PCCERT_CONTEXT pCert, DWORD dwFlags,
++    void *pvReserved, HCRYPTPROV *phCryptProv, DWORD *pdwKeySpec, BOOL *pfCallerFreeProv) = NULL;
  
 @@ -387,16 +387,18 @@ int SSL_CTX_use_CryptoAPI_certificate(SS
  	    goto err;
