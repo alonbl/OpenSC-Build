@@ -54,7 +54,7 @@ diff -urNp openssl-SNAP-20081003/Configure openssl-SNAP-20081003.mingw64/Configu
  my $IsMK1MF=scalar grep /^$target$/,@MK1MF_Builds;
  
 -$exe_ext=".exe" if ($target eq "Cygwin" || $target eq "DJGPP" || $target eq "mingw");
-+$exe_ext=".exe" if ($target eq "Cygwin" || $target eq "DJGPP" || $target =~ /^mingw*/);
++$exe_ext=".exe" if ($target eq "Cygwin" || $target eq "DJGPP" || $target =~ /^mingw/);
  $exe_ext=".nlm" if ($target =~ /netware/);
  $exe_ext=".pm"  if ($target =~ /vos/);
  $openssldir="/usr/local/ssl" if ($openssldir eq "" and $prefix eq "");
