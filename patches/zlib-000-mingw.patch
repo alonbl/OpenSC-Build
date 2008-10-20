@@ -3,8 +3,9 @@ Support cross compile.
 
 ---
 
+diff -urNp zlib-1.2.3.org/win32/Makefile.gcc zlib-1.2.3/win32/Makefile.gcc
 --- zlib-1.2.3.org/win32/Makefile.gcc	2003-08-02 06:49:00.000000000 +0300
-+++ zlib-1.2.3/win32/Makefile.gcc	2008-03-15 14:05:32.000000000 +0200
++++ zlib-1.2.3/win32/Makefile.gcc	2008-10-20 11:58:58.000000000 +0200
 @@ -30,7 +30,8 @@ IMPLIB    = libzdll.a
  #LOC = -DASMV
  #LOC = -DDEBUG -g
@@ -28,15 +29,18 @@ Support cross compile.
  RCFLAGS = --define GCC_WINDRES
  
  CP = cp -fp
-@@ -79,7 +80,7 @@ $(STATICLIB): $(OBJS) $(OBJA)
+@@ -79,9 +80,9 @@ $(STATICLIB): $(OBJS) $(OBJA)
  $(IMPLIB): $(SHAREDLIB)
  
  $(SHAREDLIB): win32/zlib.def $(OBJS) $(OBJA) zlibrc.o
 -	dllwrap --driver-name $(CC) --def win32/zlib.def \
 +	$(PREFIX)dllwrap --driver-name $(CC) --def win32/zlib.def \
  	  --implib $(IMPLIB) -o $@ $(OBJS) $(OBJA) zlibrc.o
- 	strip $@
+-	strip $@
++	$(PREFIX)strip $@
  
+ example: example.o $(STATICLIB)
+ 	$(LD) $(LDFLAGS) -o $@ example.o $(STATICLIB)
 @@ -99,23 +100,26 @@ zlibrc.o: win32/zlib1.rc
  	$(RC) $(RCFLAGS) -o $@ win32/zlib1.rc
  

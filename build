@@ -118,6 +118,9 @@ extract() {
 			patch -d "${BUILDROOT}/${product}"* -p1 < "${f}" || die "Patch '${f}'"
 		fi
 	done
+
+	# Fix win64 libtool
+	find "${BUILDROOT}" -name ltmain.sh | xargs sed -i 's/architecture: i386)?/architecture: i386)?|file format pe-x86-64?/'
 }
 
 build_dep() {
