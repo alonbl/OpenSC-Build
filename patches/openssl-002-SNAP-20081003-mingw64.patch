@@ -1,42 +1,3 @@
-diff -urNp openssl-SNAP-20081003/apps/speed.c openssl-SNAP-20081003.mingw64/apps/speed.c
---- openssl-SNAP-20081003/apps/speed.c	2007-11-16 17:00:11.000000000 +0200
-+++ openssl-SNAP-20081003.mingw64/apps/speed.c	2008-10-20 12:58:43.000000000 +0200
-@@ -261,7 +261,8 @@ static SIGRETTYPE sig_done(int sig)
- 
- #define SIGALRM
- static unsigned int lapse,schlock;
--static void alarm(unsigned int secs) { lapse = secs*1000; }
-+static void myalarm(unsigned int secs) { lapse = secs*1000; }
-+#define ALARM myalarm
- 
- static DWORD WINAPI sleepy(VOID *arg)
- 	{
-@@ -291,6 +291,7 @@ static double Time_F(int s)
- 	return app_tminterval(s,usertime);
- 	}
- #else
-+#define ALARM alarm
- 
- static double Time_F(int s)
- 	{
-@@ -2514,7 +2515,7 @@ static void print_message(const char *s,
- 	BIO_printf(bio_err,mr ? "+DT:%s:%d:%d\n"
- 		   : "Doing %s for %ds on %d size blocks: ",s,SECONDS,length);
- 	(void)BIO_flush(bio_err);
--	alarm(SECONDS);
-+	ALARM(SECONDS);
- #else
- 	BIO_printf(bio_err,mr ? "+DN:%s:%ld:%d\n"
- 		   : "Doing %s %ld times on %d size blocks: ",s,num,length);
-@@ -2532,7 +2533,7 @@ static void pkey_print_message(const cha
- 	BIO_printf(bio_err,mr ? "+DTP:%d:%s:%s:%d\n"
- 			   : "Doing %d bit %s %s's for %ds: ",bits,str,str2,tm);
- 	(void)BIO_flush(bio_err);
--	alarm(RSA_SECONDS);
-+	ALARM(RSA_SECONDS);
- #else
- 	BIO_printf(bio_err,mr ? "+DNP:%ld:%d:%s:%s\n"
- 			   : "Doing %ld %d bit %s %s's: ",num,bits,str,str2);
 diff -urNp openssl-SNAP-20081003/Configure openssl-SNAP-20081003.mingw64/Configure
 --- openssl-SNAP-20081003/Configure	2008-09-16 00:00:05.000000000 +0300
 +++ openssl-SNAP-20081003.mingw64/Configure	2008-10-20 12:37:37.000000000 +0200
@@ -44,7 +5,7 @@ diff -urNp openssl-SNAP-20081003/Configure openssl-SNAP-20081003.mingw64/Configu
  # MinGW
  "mingw", "gcc:-mno-cygwin -DL_ENDIAN -fomit-frame-pointer -O3 -march=i486 -Wall:::MINGW32:-lws2_32 -lgdi32:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts} EXPORT_VAR_AS_FN:${x86_coff_asm}:win32:cygwin-shared:-D_WINDLL -DOPENSSL_USE_APPLINK:-mno-cygwin:.dll.a",
  
-+"mingw64", "gcc:-mno-cygwin -DL_ENDIAN -DWIN32_LEAN_AND_MEAN -fomit-frame-pointer -O3 -Wall -D_WIN32_WINNT=0x333:::MINGW64:-lws2_32 -lgdi32:SIXTY_FOUR_BIT RC4_CHUNK_LL DES_INT EXPORT_VAR_AS_FN:${no_asm}:win32:cygwin-shared:-D_WINDLL:-mno-cygwin -shared:.dll.a",
++"mingw64", "gcc:-mno-cygwin -DL_ENDIAN -DWIN32_LEAN_AND_MEAN -fomit-frame-pointer -O3 -Wall -D_WIN32_WINNT=0x333:::MINGW64:-lws2_32 -lgdi32:SIXTY_FOUR_BIT RC4_CHUNK_LL DES_INT EXPORT_VAR_AS_FN:${no_asm}:win32:cygwin-shared:-D_WINDLL:-mno-cygwin:.dll.a",
 +
  # UWIN 
  "UWIN", "cc:-DTERMIOS -DL_ENDIAN -O -Wall:::UWIN::BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${no_asm}:win32",
