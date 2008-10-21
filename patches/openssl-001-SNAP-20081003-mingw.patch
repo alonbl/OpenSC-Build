@@ -1,8 +1,12 @@
 
-The depend use native CC and not cross compile, so mingw flags
-are not accepted.
-
 _XOPEN_SOURCE cannot be used in mingw, strptime is never used anyway?
+
+Added -DWIN32_LEAN_AND_MEAN and drop the conflict undef of x509.h
+
+Make domd use cross compiler if available.
+
+Update depend to execute update so that openssl/crypto/objects/obj_xref.h
+will be generated as it is required for "make depend".
 
 ---
 
@@ -17,15 +21,75 @@ diff -urNp openssl-SNAP-20081003.org/ssl/kssl.c openssl-SNAP-20081003/ssl/kssl.c
  #include <time.h>
  #if 0 /* Experimental */
  #undef _XOPEN_SOURCE /* To avoid clashes with anything else... */
-diff -urNp openssl-SNAP-20081003.org/util/domd openssl-SNAP-20081003/util/domd
---- openssl-SNAP-20081003.org/util/domd	2008-09-09 23:00:21.000000000 +0300
-+++ openssl-SNAP-20081003/util/domd	2008-10-04 21:29:05.000000000 +0300
+--- openssl-SNAP-20081019/Configure	2008-10-12 17:00:05.000000000 +0200
++++ openssl-SNAP-20081019.old/Configure	2008-10-21 20:13:28.000000000 +0200
+@@ -495,7 +495,7 @@ my %table=(
+ "BC-32","bcc32::::WIN32::BN_LLONG DES_PTR RC4_INDEX EXPORT_VAR_AS_FN:${no_asm}:win32",
+ 
+ # MinGW
+-"mingw", "gcc:-mno-cygwin -DL_ENDIAN -fomit-frame-pointer -O3 -march=i486 -Wall:::MINGW32:-lws2_32 -lgdi32:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts} EXPORT_VAR_AS_FN:${x86_coff_asm}:win32:cygwin-shared:-D_WINDLL -DOPENSSL_USE_APPLINK:-mno-cygwin:.dll.a",
++"mingw", "gcc:-mno-cygwin -DWIN32_LEAN_AND_MEAN -DL_ENDIAN -fomit-frame-pointer -O3 -march=i486 -Wall:::MINGW32:-lws2_32 -lgdi32:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts} EXPORT_VAR_AS_FN:${x86_coff_asm}:win32:cygwin-shared:-D_WINDLL -DOPENSSL_USE_APPLINK:-mno-cygwin:.dll.a",
+ 
+ # UWIN 
+ "UWIN", "cc:-DTERMIOS -DL_ENDIAN -O -Wall:::UWIN::BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${no_asm}:win32",
+@@ -1394,12 +1394,13 @@ while (<IN>)
+ 		s/^AR=\s*/AR= \$\(CROSS_COMPILE_PREFIX\)/;
+ 		s/^NM=\s*/NM= \$\(CROSS_COMPILE_PREFIX\)/;
+ 		s/^RANLIB=\s*/RANLIB= \$\(CROSS_COMPILE_PREFIX\)/;
++		s/^MAKEDEPPROG=.*$/MAKEDEPPROG= \$\(CROSS_COMPILE_PREFIX\)$cc/ if $cc eq "gcc";
+ 		}
+ 	else	{
+ 		s/^CC=.*$/CC= $cc/;
+ 		s/^RANLIB=.*/RANLIB= $ranlib/;
++		s/^MAKEDEPPROG=.*$/MAKEDEPPROG= $cc/ if $cc eq "gcc";
+ 		}
+-	s/^MAKEDEPPROG=.*$/MAKEDEPPROG= $cc/ if $cc eq "gcc";
+ 	s/^CFLAG=.*$/CFLAG= $cflags/;
+ 	s/^DEPFLAG=.*$/DEPFLAG= $depflags/;
+ 	s/^PEX_LIBS=.*$/PEX_LIBS= $prelflags/;
+--- openssl-SNAP-20081019/util/domd	2008-09-09 23:00:21.000000000 +0300
++++ openssl-SNAP-20081019.old/util/domd	2008-10-21 20:16:57.000000000 +0200
+@@ -14,7 +14,7 @@ if [ "$MAKEDEPEND" = "" ]; then MAKEDEPE
+ cp Makefile Makefile.save
+ # fake the presence of Kerberos
+ touch $TOP/krb5.h
+-if [ "$MAKEDEPEND" = "gcc" ]; then
++if echo "$MAKEDEPEND" | grep "gcc" > /dev/null;  then
+     args=""
+     while [ $# -gt 0 ]; do
+ 	if [ "$1" != "--" ]; then args="$args $1"; fi
 @@ -22,7 +22,7 @@ if [ "$MAKEDEPEND" = "gcc" ]; then
      done
      sed -e '/^# DO NOT DELETE.*/,$d' < Makefile > Makefile.tmp
      echo '# DO NOT DELETE THIS LINE -- make depend depends on it.' >> Makefile.tmp
 -    gcc -Werror -D OPENSSL_DOING_MAKEDEPEND -M $args >> Makefile.tmp || exit
-+    gcc -D OPENSSL_DOING_MAKEDEPEND -M $args >> Makefile.tmp
++    "$MAKEDEPEND" -Werror -D OPENSSL_DOING_MAKEDEPEND -M $args >> Makefile.tmp || exit
      ${PERL} $TOP/util/clean-depend.pl < Makefile.tmp > Makefile.new
      rm -f Makefile.tmp
  else
+--- openssl-SNAP-20081019.old/Makefile.org	2008-06-04 15:00:10.000000000 +0300
++++ openssl-SNAP-20081019/Makefile.org	2008-10-21 20:30:17.000000000 +0200
+@@ -409,7 +409,7 @@ tests: rehash
+ report:
+ 	@$(PERL) util/selftest.pl
+ 
+-depend:
++depend:	update
+ 	@set -e; target=depend; $(RECURSIVE_BUILD_CMD)
+ 
+ lint:
+--- openssl-SNAP-20081019/crypto/x509/x509.h	2008-10-08 01:00:18.000000000 +0200
++++ openssl-SNAP-20081019.new/crypto/x509/x509.h	2008-10-21 20:42:20.000000000 +0200
+@@ -112,12 +112,6 @@
+ extern "C" {
+ #endif
+ 
+-#ifdef OPENSSL_SYS_WIN32
+-/* Under Win32 these are defined in wincrypt.h */
+-#undef X509_NAME
+-#undef X509_CERT_PAIR
+-#endif
+-
+ #define X509_FILETYPE_PEM	1
+ #define X509_FILETYPE_ASN1	2
+ #define X509_FILETYPE_DEFAULT	3
