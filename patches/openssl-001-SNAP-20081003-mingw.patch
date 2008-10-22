@@ -10,17 +10,6 @@ will be generated as it is required for "make depend".
 
 ---
 
-diff -urNp openssl-SNAP-20081003.org/ssl/kssl.c openssl-SNAP-20081003/ssl/kssl.c
---- openssl-SNAP-20081003.org/ssl/kssl.c	2007-02-10 13:00:54.000000000 +0200
-+++ openssl-SNAP-20081003/ssl/kssl.c	2008-10-04 21:30:51.000000000 +0300
-@@ -68,7 +68,6 @@
- 
- #include <openssl/opensslconf.h>
- 
--#define _XOPEN_SOURCE 500 /* glibc2 needs this to declare strptime() */
- #include <time.h>
- #if 0 /* Experimental */
- #undef _XOPEN_SOURCE /* To avoid clashes with anything else... */
 --- openssl-SNAP-20081019/Configure	2008-10-12 17:00:05.000000000 +0200
 +++ openssl-SNAP-20081019.old/Configure	2008-10-21 20:13:28.000000000 +0200
 @@ -495,7 +495,7 @@ my %table=(
