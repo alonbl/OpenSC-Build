@@ -25,15 +25,15 @@ fi
 
 mkdir -p "${build}/binutils"
 cd "${build}/binutils"
-no_tk=1 "${src}/binutils/configure" \
+"${src}/binutils/configure" \
 	--target="${arch}" \
 	--prefix="${toolchain}" \
 	--with-sysroot="${sysroot}" \
 	--without-x \
-	--with-tcl="${build}/binutils/tcl/unix" \
+	--disable-gdbtk \
 	|| die "binutils.configure"
-no_tk=1 make all-host || die "binutils.make.1"
-no_tk=1 make install-host || die "binutils.install.1"
+make all-host || die "binutils.make.1"
+make install-host || die "binutils.install.1"
 
 svn export "${src}/mingw-w64/mingw-w64-headers/include" "${toolchain}/${arch}/include" || die "mingw-w64-headers.install"
 mkdir -p "${sysroot}/${arch}"
