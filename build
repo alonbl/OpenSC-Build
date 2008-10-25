@@ -155,10 +155,7 @@ build_dep() {
 		--openssldir=/etc/ssl \
 		${EXTRA_OPENSSL_CONFIG} \
 		|| die "Configure openssl"
-	if [ -n "${BUILD_FOR_WINDOWS}" ]; then
-		perl util/mkdef.pl crypto update
-		perl util/mkdef.pl ssl update
-	fi
+	[ -n "${BUILD_FOR_WINDOWS}" ] && perl util/mkdef.pl crypto ssl NT update
 	${MAKE} depend install INSTALL_PREFIX="${OPENSC_ROOT}" INSTALLTOP="/" MANDIR="/tmp" \
 		|| die "make openssl"
 	rm -fr "${OPENSC_ROOT}/tmp"

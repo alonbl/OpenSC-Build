@@ -1,0 +1,73 @@
+#!/bin/sh
+
+die() {
+	local m="$1"
+	echo "FATAL: ${m}" >&2
+	exit 1
+}
+
+arch="x86_64-pc-mingw32"
+
+base="$( cd "$(dirname $0)"; pwd )"
+sysroot="${base}/sysroot"
+toolchain="${base}/toolchain"
+build="${base}/tmp"
+src="${base}/src"
+
+rm -fr "${build}" "${sysroot}" "${toolchain}" || die "clean"
+
+if false; then
+( cd "${src}/binutils"; cvs update ) || die "binutils.update"
+svn update "${src}/gcc" || die "gcc.update"
+( cd "${src}/gcc"; ./contrib/gcc_update --touch )
+svn update "${src}/mingw-w64" || die "mingw-w64.update"
+fi
+
+mkdir -p "${build}/binutils"
+cd "${build}/binutils"
+no_tk=1 "${src}/binutils/configure" \
+	--target="${arch}" \
+	--prefix="${toolchain}" \
+	--with-sysroot="${sysroot}" \
+	--without-x \
+	--with-tcl="${build}/binutils/tcl/unix" \
+	|| die "binutils.configure"
+no_tk=1 make all-host || die "binutils.make.1"
+no_tk=1 make install-host || die "binutils.install.1"
+
+svn export "${src}/mingw-w64/mingw-w64-headers/include" "${toolchain}/${arch}/include" || die "mingw-w64-headers.install"
+mkdir -p "${sysroot}/${arch}"
+ln -s "${arch}" "${sysroot}/mingw" || die "ln"
+ln -s "${toolchain}/${arch}/include" "${sysroot}/${arch}/include" || die "ln"
+
+mkdir -p "${build}/gcc"
+cd "${build}/gcc"
+"${src}/gcc/configure" \
+	--target="${arch}" \
+	--prefix="${toolchain}" \
+	--with-sysroot="${sysroot}" \
+	--enable-languages="c,c++" \
+	|| die "gcc.configure"
+make all-gcc || die "gcc.make.1"
+make install-gcc || die "gcc.install.1"
+
+export PATH="${toolchain}/bin:${PATH}"
+
+mkdir -p "${build}/mingw-w64-crt"
+cd "${build}/mingw-w64-crt"
+"${src}/mingw-w64/mingw-w64-crt/configure" \
+	--host="${arch}" \
+	--prefix="${toolchain}" \
+	--with-sysroot="${sysroot}" \
+	|| die "mingw-w64-crt.configure"
+make || die "mingw-w64-crt.make"
+make install || die "mingw-w64-crt.install"
+
+cd "${build}/gcc"
+make || die "gcc.make"
+make install || die "gcc.install"
+
+#cd "${build}/binutils"
+#make || die "binutils.make"
+#make install || die "binutils.install"
+
