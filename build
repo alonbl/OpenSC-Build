@@ -36,11 +36,9 @@ die() {
 	exit 1
 }
 
-get_my_dir() {
-	local o="$(pwd)"
-	cd "$(dirname "$0")"
-	pwd
-	cd "${o}"
+get_full_path() {
+	local d="$1"
+	( cd "${d}" 2> /dev/null && pwd )
 }
 
 fixup_la() {
@@ -120,7 +118,7 @@ extract() {
 	done
 
 	# Fix win64 libtool
-	find "${BUILDROOT}" -name ltmain.sh | xargs sed -i 's/architecture: i386)?/architecture: i386)?|file format pe-x86-64/'
+	find "${BUILDROOT}" -name ltmain.sh | xargs sed -i 's/architecture: i386)?'\''/architecture: i386)?|file format pe-x86-64'\''/'
 }
 
 build_dep() {
@@ -290,7 +288,7 @@ pack() {
 	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-openvpn.tar.bz2" -C "${OPENVPN_ROOT}" . || die "openvpn"
 }
 
-SCRIPTROOT="$(get_my_dir)"
+SCRIPTROOT="$(get_full_path "$(dirname "$0")")"
 
 #CHOST
 #CTARGET
