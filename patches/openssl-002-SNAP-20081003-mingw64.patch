@@ -42,3 +42,22 @@ diff -urNp openssl-SNAP-20081003/Configure openssl-SNAP-20081003.mingw64/Configu
  #define SIGALRM
  static unsigned int lapse,schlock;
  static void alarm(unsigned int secs) { lapse = secs*1000; }
+--- openssl-SNAP-20081023/crypto/sha/sha512.c	2008-04-24 13:00:12.000000000 +0300
++++ openssl-SNAP-20081023.mingw64/crypto/sha/sha512.c	2008-10-28 00:19:56.000000000 +0200
+@@ -350,11 +350,15 @@ static const SHA_LONG64 K512[80] = {
+ #ifndef PEDANTIC
+ # if defined(__GNUC__) && __GNUC__>=2 && !defined(OPENSSL_NO_ASM) && !defined(OPENSSL_NO_INLINE_ASM)
+ #  if defined(__x86_64) || defined(__x86_64__)
+-#   define ROTR(a,n)	({ unsigned long ret;		\
++#   if defined(_WIN64)
++#    define ROTR(a,n)	_rotr64((a),n)	/* applies to both IA-64 and AMD64 */
++#   else
++#    define ROTR(a,n)	({ unsigned long ret;		\
+ 				asm ("rorq %1,%0"	\
+ 				: "=r"(ret)		\
+ 				: "J"(n),"0"(a)		\
+ 				: "cc"); ret;		})
++#   endif
+ #   if !defined(B_ENDIAN)
+ #    define PULL64(x) ({ SHA_LONG64 ret=*((const SHA_LONG64 *)(&(x)));	\
+ 				asm ("bswapq	%0"		\
