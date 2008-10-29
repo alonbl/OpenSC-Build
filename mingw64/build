@@ -25,6 +25,10 @@ BINUTILS_SRC="$(get_full_path "${BINUTILS_SRC}")"
 GCC_SRC="$(get_full_path "${GCC_SRC}")"
 MINGW_W64_SRC="$(get_full_path "${MINGW_W64_SRC}")"
 
+[ -e "${BINUTILS_SRC}" ] || die "Cannot find binutils sources"
+[ -e "${GCC_SRC}" ] || die "Cannot find gcc sources"
+[ -e "${MINGW_W64_SRC}" ] || die "Cannot find mingw-w64 sources"
+
 rm -fr "${BUILDROOT}" "${SYSROOT}" "${TOOLCHAIN_ROOT}" || die "clean"
 
 if [ -n "${DO_UPDATE}" ]; then
