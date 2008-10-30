@@ -32,22 +32,36 @@ diff -urNp openssl-SNAP-20081003/Configure openssl-SNAP-20081003.mingw64/Configu
  
  #if defined(OPENSSL_SYS_NETWARE) && defined(NETWARE_CLIB)
  #define getpid GetThreadID
---- openssl-SNAP-20081023/crypto/sha/sha512.c	2008-04-24 13:00:12.000000000 +0300
-+++ openssl-SNAP-20081023.mingw64/crypto/sha/sha512.c	2008-10-28 00:19:56.000000000 +0200
-@@ -350,11 +350,15 @@ static const SHA_LONG64 K512[80] = {
+diff -urNp openssl-SNAP-20081028.org/crypto/sha/sha512.c openssl-SNAP-20081028/crypto/sha/sha512.c
+--- openssl-SNAP-20081028/crypto/sha/sha512.c	2008-04-24 13:00:12.000000000 +0300
++++ openssl-SNAP-20081028.mingw64/crypto/sha/sha512.c	2008-10-30 22:41:20.000000000 +0200
+@@ -350,7 +350,7 @@ static const SHA_LONG64 K512[80] = {
  #ifndef PEDANTIC
  # if defined(__GNUC__) && __GNUC__>=2 && !defined(OPENSSL_NO_ASM) && !defined(OPENSSL_NO_INLINE_ASM)
  #  if defined(__x86_64) || defined(__x86_64__)
 -#   define ROTR(a,n)	({ unsigned long ret;		\
-+#   if defined(_WIN64)
-+#    define ROTR(a,n)	_rotr64((a),n)	/* applies to both IA-64 and AMD64 */
-+#   else
-+#    define ROTR(a,n)	({ unsigned long ret;		\
++#   define ROTR(a,n)	({ SHA_LONG64 ret;	\
  				asm ("rorq %1,%0"	\
  				: "=r"(ret)		\
  				: "J"(n),"0"(a)		\
- 				: "cc"); ret;		})
-+#   endif
- #   if !defined(B_ENDIAN)
- #    define PULL64(x) ({ SHA_LONG64 ret=*((const SHA_LONG64 *)(&(x)));	\
- 				asm ("bswapq	%0"		\
+--- openssl-SNAP-20081028/apps/speed.c	2008-10-30 22:59:03.000000000 +0200
++++ openssl-SNAP-20081028.mingw64/apps/speed.c	2008-10-30 22:59:16.000000000 +0200
+@@ -281,7 +281,7 @@ static double Time_F(int s)
+ 		if (thr==NULL)
+ 			{
+ 			DWORD ret=GetLastError();
+-			BIO_printf(bio_err,"unable to CreateThread (%d)",ret);
++			BIO_printf(bio_err,"unable to CreateThread (%ld)",ret);
+ 			ExitProcess(ret);
+ 			}
+ 		CloseHandle(thr);		/* detach the thread	*/
+--- openssl-SNAP-20081028/crypto/jpake/jpake.c	2008-10-27 15:00:14.000000000 +0200
++++ openssl-SNAP-20081028.mingw64/crypto/jpake/jpake.c	2008-10-30 23:23:30.000000000 +0200
+@@ -5,6 +5,7 @@
+ #include <openssl/err.h>
+ #include <memory.h>
+ #include <assert.h>
++#include <string.h>
+ 
+ /*
+  * In the definition, (xa, xb, xc, xd) are Alice's (x1, x2, x3, x4) or
