@@ -5,7 +5,7 @@ diff -urNp openssl-SNAP-20081003/Configure openssl-SNAP-20081003.mingw64/Configu
  # MinGW
  "mingw", "gcc:-mno-cygwin -DL_ENDIAN -fomit-frame-pointer -O3 -march=i486 -Wall:::MINGW32:-lws2_32 -lgdi32:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts} EXPORT_VAR_AS_FN:${x86_coff_asm}:win32:cygwin-shared:-D_WINDLL -DOPENSSL_USE_APPLINK:-mno-cygwin:.dll.a",
  
-+"mingw64", "gcc:-mno-cygwin -DL_ENDIAN -DWIN32_LEAN_AND_MEAN -fomit-frame-pointer -O3 -Wall -D_WIN32_WINNT=0x333:::MINGW64:-lws2_32 -lgdi32:SIXTY_FOUR_BIT RC4_CHUNK_LL DES_INT EXPORT_VAR_AS_FN:${no_asm}:win32:cygwin-shared:-D_WINDLL:-mno-cygwin:.dll.a",
++"mingw64", "gcc:-mno-cygwin -DL_ENDIAN -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -fomit-frame-pointer -O3 -Wall -D_WIN32_WINNT=0x333:::MINGW64:-lws2_32 -lgdi32:SIXTY_FOUR_BIT RC4_CHUNK_LL DES_INT EXPORT_VAR_AS_FN:${no_asm}:win32:cygwin-shared:-D_WINDLL:-mno-cygwin:.dll.a",
 +
  # UWIN 
  "UWIN", "cc:-DTERMIOS -DL_ENDIAN -O -Wall:::UWIN::BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${no_asm}:win32",
@@ -55,13 +55,22 @@ diff -urNp openssl-SNAP-20081028.org/crypto/sha/sha512.c openssl-SNAP-20081028/c
  			ExitProcess(ret);
  			}
  		CloseHandle(thr);		/* detach the thread	*/
---- openssl-SNAP-20081028/crypto/jpake/jpake.c	2008-10-27 15:00:14.000000000 +0200
-+++ openssl-SNAP-20081028.mingw64/crypto/jpake/jpake.c	2008-10-30 23:23:30.000000000 +0200
-@@ -5,6 +5,7 @@
- #include <openssl/err.h>
- #include <memory.h>
- #include <assert.h>
-+#include <string.h>
- 
- /*
-  * In the definition, (xa, xb, xc, xd) are Alice's (x1, x2, x3, x4) or
+--- openssl-SNAP-20081028/crypto/bio/bss_log.c	2008-10-31 14:32:17.000000000 +0200
++++ openssl-SNAP-20081028.mingw64/crypto/bio/bss_log.c	2008-10-31 14:24:51.000000000 +0200
+@@ -71,6 +71,7 @@
+ #if defined(OPENSSL_SYS_WINCE)
+ #elif defined(OPENSSL_SYS_WIN32)
+ #  include <process.h>
++#  include <tchar.h>
+ #elif defined(OPENSSL_SYS_VMS)
+ #  include <opcdef.h>
+ #  include <descrip.h>
+@@ -253,7 +252,7 @@ static void xopenlog(BIO* bp, char* name
+ 	if ( !register_event_source )
+ 		{
+ 		HANDLE	advapi;
+-		if ( !(advapi = GetModuleHandle("advapi32")) )
++		if ( !(advapi = GetModuleHandle(_T("advapi32"))) )
+ 			return;
+ 		register_event_source = (HANDLE (WINAPI *)())DL_PROC_X(advapi,
+ 			"RegisterEventSource" );
