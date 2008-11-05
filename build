@@ -278,6 +278,13 @@ clean_empty_dirs() {
 	find "${IMAGEROOT}" -type d | sort -r | xargs rmdir 2> /dev/null
 }
 
+# Fixed in libtool-2
+fixup_libtool_win_strip() {
+	if [ "${DO_STRIP}" = "1" ]; then
+		find "${IMAGEROOT}" -name '*.dll' | xargs "${CHOST:+${CHOST}-}strip"
+	fi
+}
+
 pack() {
 	echo "Packing images"
 	local X="${CHOST:-$(gcc -dumpmachine)}"
@@ -353,6 +360,7 @@ build_openvpn
 copy_docs
 copy_sources
 clean_empty_dirs
+fixup_libtool_win_strip
 pack
 
 exit 0
