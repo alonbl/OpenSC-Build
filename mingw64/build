@@ -57,9 +57,8 @@ make all-host || die "binutils.make.1"
 make install-host || die "binutils.install.1"
 
 svn export "${MINGW_W64_SRC}/mingw-w64-headers/include" "${TOOLCHAIN_ROOT}/${CHOST}/include" || die "mingw-w64-headers.install"
-mkdir -p "${SYSROOT}/${CHOST}"
-ln -s "${CHOST}" "${SYSROOT}/mingw" || die "ln"
-ln -s "${TOOLCHAIN_ROOT}/${CHOST}/include" "${SYSROOT}/${CHOST}/include" || die "ln"
+mkdir -p "${SYSROOT}"
+ln -s "${TOOLCHAIN_ROOT}/${CHOST}" "${SYSROOT}/mingw" || die "ln"
 
 mkdir -p "${BUILDROOT}/gcc"
 cd "${BUILDROOT}/gcc"
