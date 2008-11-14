@@ -148,7 +148,8 @@ build_dep() {
 	cd "${BUILDROOT}/openssl"* || die "cd openssl"
 
 	./Configure --prefix="//" --cross-compile-prefix=${CHOST:+${CHOST}-} \
-		no-zlib shared $(CHOST="${CHOST}" "${SCRIPTROOT}/gentoo.config-0.9.8") \
+		shared $(CHOST="${CHOST}" "${SCRIPTROOT}/gentoo.config-0.9.8") \
+		zlib-dynamic ${ZLIB_CFLAGS} \
 		no-capieng \
 		--openssldir=/etc/ssl \
 		${EXTRA_OPENSSL_CONFIG} \
