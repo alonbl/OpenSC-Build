@@ -12,6 +12,7 @@ get_full_path() {
 }
 
 CHOST="x86_64-pc-mingw32"
+MAKE="${MAKE:-make}"
 SCRIPTROOT="$(get_full_path "$(dirname "$0")")"
 BUILDROOT="${BUILDROOT:-${SCRIPTROOT}/tmp}"
 SOURCESROOT="${SOURCESROOT:-${SCRIPTROOT}/sources}"
@@ -53,8 +54,8 @@ cd "${BUILDROOT}/binutils"
 	--without-x \
 	--disable-gdbtk \
 	|| die "binutils.configure"
-make all-host || die "binutils.make.1"
-make install-host || die "binutils.install.1"
+${MAKE} ${MAKEOPTS} all-host || die "binutils.make.1"
+${MAKE} ${MAKEOPTS} install-host || die "binutils.install.1"
 
 svn export "${MINGW_W64_SRC}/mingw-w64-headers/include" "${TOOLCHAIN_ROOT}/${CHOST}/include" || die "mingw-w64-headers.install"
 mkdir -p "${SYSROOT}"
@@ -68,8 +69,8 @@ cd "${BUILDROOT}/gcc"
 	--with-sysroot="${SYSROOT}" \
 	--enable-languages="c,c++" \
 	|| die "gcc.configure"
-make all-gcc || die "gcc.make.1"
-make install-gcc || die "gcc.install.1"
+${MAKE} ${MAKEOPTS} all-gcc || die "gcc.make.1"
+${MAKE} ${MAKEOPTS} install-gcc || die "gcc.install.1"
 
 export PATH="${TOOLCHAIN_ROOT}/bin:${PATH}"
 
@@ -80,9 +81,9 @@ cd "${BUILDROOT}/mingw-w64-crt"
 	--prefix="${TOOLCHAIN_ROOT}" \
 	--with-sysroot="${SYSROOT}" \
 	|| die "mingw-w64-crt.configure"
-make || die "mingw-w64-crt.make"
-make install || die "mingw-w64-crt.install"
+${MAKE} ${MAKEOPTS} || die "mingw-w64-crt.make"
+${MAKE} ${MAKEOPTS} install || die "mingw-w64-crt.install"
 
 cd "${BUILDROOT}/gcc"
-make || die "gcc.make"
-make install || die "gcc.install"
+${MAKE} ${MAKEOPTS} || die "gcc.make"
+${MAKE} ${MAKEOPTS} install || die "gcc.install"
