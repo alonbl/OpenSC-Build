@@ -13,37 +13,61 @@ get_full_path() {
 
 CHOST="x86_64-pc-mingw32"
 MAKE="${MAKE:-make}"
+MAKEOPTS="${MAKEOPTS:--j2}"
 SCRIPTROOT="$(get_full_path "$(dirname "$0")")"
 BUILDROOT="${BUILDROOT:-${SCRIPTROOT}/tmp}"
 SOURCESROOT="${SOURCESROOT:-${SCRIPTROOT}/sources}"
-BINUTILS_SRC="${BINUTILS_SRC:-${SOURCESROOT}/binutils}"
-GCC_SRC="${GCC_SRC:-${SOURCESROOT}/gcc}"
-MINGW_W64_SRC="${MINGW_W64_SRC:-${SOURCESROOT}/mingw-w64}"
 SYSROOT="${SCRIPTROOT}/sysroot"
 TOOLCHAIN_ROOT="${SCRIPTROOT}/toolchain"
 
+MPFR_SRC="${MPFR_SRC:-${SOURCESROOT}/mpfr-2.3.1}"
+GMP_SRC="${GMP_SRC:-${SOURCESROOT}/gmp-4.2.2}"
+BINUTILS_SRC="${BINUTILS_SRC:-${SOURCESROOT}/binutils}"
+GCC_SRC="${GCC_SRC:-${SOURCESROOT}/gcc-4.3.2}"
+MINGW_W64_SRC="${MINGW_W64_SRC:-${SOURCESROOT}/mingw-w64}"
+
+MPFR_SRC="$(get_full_path "${MPFR_SRC}")"
+GMP_SRC="$(get_full_path "${GMP_SRC}")"
 BINUTILS_SRC="$(get_full_path "${BINUTILS_SRC}")"
 GCC_SRC="$(get_full_path "${GCC_SRC}")"
 MINGW_W64_SRC="$(get_full_path "${MINGW_W64_SRC}")"
 
-[ -e "${BINUTILS_SRC}" ] || die "Cannot find binutils sources"
-[ -e "${GCC_SRC}" ] || die "Cannot find gcc sources"
-[ -e "${MINGW_W64_SRC}" ] || die "Cannot find mingw-w64 sources"
-
 rm -fr "${BUILDROOT}" "${SYSROOT}" "${TOOLCHAIN_ROOT}" || die "clean"
 
-if [ -n "${DO_UPDATE}" ]; then
-	if [ -d "${BINUTILS_SRC}/CVS" ]; then
-		( cd "${BINUTILS_SRC}"; cvs update ) || die "binutils.update"
+for d in \
+	"${BINUTILS_SRC}" \
+	"${GCC_SRC}" \
+	"${MPFR_SRC}" \
+	"${GMP_SRC}" \
+	"${MINGW_W64_SRC}"; do
+
+	[ -d "${d}" ] || die "Directory '${d}' should exist"
+
+	if [ -n "${DO_UPDATE}" ]; then
+		if [ -d "${d}/CVS" ]; then
+			( cd "${d}"; cvs update ) || die "cvs.update '${d}'"
+		fi
+		if [ -d "${d}/.svn" ]; then
+			svn update "${d}" || die "svn.update '${d}'"
+			[ -e "${d}"/contrib/gcc_update ] && \
+				( cd "${d}"; ./contrib/gcc_update --touch )
+		fi
 	fi
-	if [ -d "${GCC_SRC}/.svn" ]; then
-		svn update "${GCC_SRC}" || die "gcc.update"
-		( cd "${GCC_SRC}"; ./contrib/gcc_update --touch )
-	fi
-	if [ -d "${MINGW_W64_SRC}/.svn" ]; then
-		svn update "${MINGW_W64_SRC}" || die "mingw-w64.update"
-	fi
-fi
+done
+
+mkdir -p "${BUILDROOT}/mpfr"
+cd "${BUILDROOT}/mpfr"
+"${MPFR_SRC}/configure" \
+	--prefix="${TOOLCHAIN_ROOT}"
+${MAKE} ${MAKEOPTS}
+${MAKE} ${MAKEOPTS} install
+
+mkdir -p "${BUILDROOT}/gmp"
+cd "${BUILDROOT}/gmp"
+"${MPFR_SRC}/configure" \
+	--prefix="${TOOLCHAIN_ROOT}"
+${MAKE} ${MAKEOPTS}
+${MAKE} ${MAKEOPTS} install
 
 mkdir -p "${BUILDROOT}/binutils"
 cd "${BUILDROOT}/binutils"
@@ -68,6 +92,8 @@ cd "${BUILDROOT}/gcc"
 	--prefix="${TOOLCHAIN_ROOT}" \
 	--with-sysroot="${SYSROOT}" \
 	--enable-languages="c,c++" \
+	--with-mpfr="${TOOLCHAIN_ROOT}" \
+	--with-gmp="${TOOLCHAIN_ROOT}" \
 	|| die "gcc.configure"
 ${MAKE} ${MAKEOPTS} all-gcc || die "gcc.make.1"
 ${MAKE} ${MAKEOPTS} install-gcc || die "gcc.install.1"
