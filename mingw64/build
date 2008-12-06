@@ -58,16 +58,18 @@ done
 mkdir -p "${BUILDROOT}/mpfr"
 cd "${BUILDROOT}/mpfr"
 "${MPFR_SRC}/configure" \
-	--prefix="${TOOLCHAIN_ROOT}"
-${MAKE} ${MAKEOPTS}
-${MAKE} ${MAKEOPTS} install
+	--prefix="${TOOLCHAIN_ROOT}" ||
+	die "mpfr.configure"
+${MAKE} ${MAKEOPTS} || die "mpfr.make"
+${MAKE} ${MAKEOPTS} install || die "mpfr.install"
 
 mkdir -p "${BUILDROOT}/gmp"
 cd "${BUILDROOT}/gmp"
 "${MPFR_SRC}/configure" \
-	--prefix="${TOOLCHAIN_ROOT}"
-${MAKE} ${MAKEOPTS}
-${MAKE} ${MAKEOPTS} install
+	--prefix="${TOOLCHAIN_ROOT}" ||
+	die "gmp.configure"
+${MAKE} ${MAKEOPTS} || die "gmp.make"
+${MAKE} ${MAKEOPTS} install || die "gmp.install"
 
 mkdir -p "${BUILDROOT}/binutils"
 cd "${BUILDROOT}/binutils"
