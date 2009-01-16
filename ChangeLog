@@ -10,6 +10,7 @@ $Id$
 
 	libtool-1.5.26
 	zlib-1.2.3
+	libiconv-1.12
 	lzo-2.02
 	openssl-SNAP-20081003
 	openct-0.6.15 (optional)
