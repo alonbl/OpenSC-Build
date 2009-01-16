@@ -142,7 +142,7 @@ build_dep() {
 	echo "Build libtool"
 	cd "${BUILDROOT}/libtool"* || die "cd libtool"
 	./configure ${CONFIGOPTS} ${EXTRA_LIBTOOL_CONFIG} || die "Configure libtool"
-	${MAKE} ${MAKEOPTS} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${OPENSC_ROOT}" || die "make opensc"
+	${MAKE} ${MAKEOPTS} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${OPENSC_ROOT}" || die "make libtool"
 	fixup_la
 
 	if [ -n "${BUILD_FOR_WINDOWS}" ]; then
