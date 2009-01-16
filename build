@@ -79,13 +79,14 @@ download() {
 	fi
 
 	for url in \
-		${ZLIB_URL} ${LZO_URL} ${LIBTOOL_URL} ${OPENSSL_URL} \
-		${OPENCT_URL} ${OPENSC_URL} ${LIBP11_URL} ${ENGINE_PKCS11_URL} \
-		${PKCS11_HELPER_URL} ${OPENVPN_URL}; do
+		${ZLIB_URL} ${LZO_URL} ${LIBTOOL_URL} ${ICONV_URL} \
+		${OPENSSL_URL} ${OPENCT_URL} ${OPENSC_URL} ${LIBP11_URL} \
+		${ENGINE_PKCS11_URL} ${PKCS11_HELPER_URL} ${OPENVPN_URL}; \
+		do
 		download1 "${url}"
 	done
 
-	if [ "$(ls "${SOURCESROOT}" | wc -l | sed 's/[ \t]//g')" != 10 ]; then
+	if [ "$(ls "${SOURCESROOT}" | wc -l | sed 's/[ \t]//g')" != 11 ]; then
 		die "sources is unclean."
 	fi
 }
@@ -143,6 +144,20 @@ build_dep() {
 	./configure ${CONFIGOPTS} ${EXTRA_LIBTOOL_CONFIG} || die "Configure libtool"
 	${MAKE} ${MAKEOPTS} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${OPENSC_ROOT}" || die "make opensc"
 	fixup_la
+
+	if [ -n "${BUILD_FOR_WINDOWS}" ]; then
+		echo "Build iconv"
+		cd "${BUILDROOT}/libiconv"* || die "cd iconv"
+		./configure ${CONFIGOPTS} ${EXTRA_ICONV_CONFIG} || die "Configure iconv"
+		${MAKE} ${MAKEOPTS} install DESTDIR="${OPENSC_ROOT}" || die "make iconv"
+		if [ "${DO_STRIP}" = "1" ]; then
+			"${CHOST:+${CHOST}-}strip" \
+				"${OPENSC_ROOT}/bin/libcharset"*.dll \
+				"${OPENSC_ROOT}/bin/libiconv"*.dll \
+				"${OPENSC_ROOT}/bin/iconv"
+		fi
+		fixup_la
+	fi
 
 	echo "Build openssl"
 	cd "${BUILDROOT}/openssl"* || die "cd openssl"
@@ -349,6 +364,8 @@ if [ -n "${BUILD_FOR_WINDOWS}" ]; then
 	export PKG_CONFIG="true"
 	export MAN2HTML="true"
 	export ZLIB_LIBS="-L${OPENSC_ROOT}/lib -lzdll"
+	export ICONV_CFLAGS="-I${OPENSC_ROOT}/include"
+	export ICONV_LIBS="-L${OPENSC_ROOT}/lib -liconv"
 fi
 
 download
