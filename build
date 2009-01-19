@@ -45,8 +45,9 @@ fixup_la() {
 	local f
 
 	echo "Fixup libtool files"
-	for f in "${IMAGEROOT}/"*"/lib"/*.la; do
-		sed 's#//#'"$(dirname "$(dirname "$(echo "${f}" | sed 's#//#/#g')")")"'/#g' "${f}" > "${f}.tmp"
+	find "${IMAGEROOT}" -name '*.la' | while read f; do
+		local top="$(dirname "$(dirname "$(echo "${f}")")" | sed 's#//#/#g')"
+		sed 's#//#'"${top}"'/#g' "${f}" > "${f}.tmp"
 		mv "${f}.tmp" "${f}"
 	done
 }
@@ -55,7 +56,7 @@ restore_la() {
 	local f
 
 	echo "Restore libtool files"
-	for f in "${IMAGEROOT}/"*"/lib"/*.la; do
+	find "${IMAGEROOT}" -name '*.la' | while read f; do
 		local x="$(echo "${IMAGEROOT}" | sed 's#/$##')"
 		sed 's#'"${x}"'/[^/]*/lib#//lib#g' "${f}" > "${f}.tmp"
 		mv "${f}.tmp" "${f}"
