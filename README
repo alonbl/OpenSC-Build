@@ -18,6 +18,10 @@ Versions
 Cross compile
 
 	$ CHOST=i686-pc-mingw32 CBUILD=i686-pc-linux-gnu ./build
+	
+	Notes:
+		Ubuntu 8.10
+			CHOST=i586-mingw32msvc
 
 MSYS
 	Download and install wget msys port.
