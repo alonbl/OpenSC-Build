@@ -297,7 +297,7 @@ clean_empty_dirs() {
 
 # Fixed in libtool-2
 fixup_libtool_win_strip() {
-	if [ "${DO_STRIP}" = "1" ]; then
+	if [ -n "${BUILD_FOR_WINDOWS}" -a "${DO_STRIP}" = "1" ]; then
 		find "${IMAGEROOT}" -name '*.dll' | xargs "${CHOST:+${CHOST}-}strip"
 	fi
 }
