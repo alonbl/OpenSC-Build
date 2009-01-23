@@ -63,14 +63,23 @@ restore_la() {
 	done
 }
 
+geturl() {
+	if [ ! -z $(which ${WGET}) ]; then
+		"${WGET}" ${WGET_OPTS} --directory-prefix="${SOURCESROOT}" "${url}"
+	else
+		echo "Fetching: ${url}"
+		file=$(basename ${url})
+		"${CURL}" ${CURL_OPTS} --progress-bar --remote-name "${url}"
+		mv "$file" "${SOURCESROOT}"
+	fi
+}
+
 download1() {
 	local url="$1"
 	local prefix="$(basename "${url}" | sed 's/-.*//g')"
 
 	if ! [ -n "$(ls "${SOURCESROOT}/${prefix}"* 2> /dev/null)" ]; then
-		"${WGET}" ${WGET_OPTS} --directory-prefix="${SOURCESROOT}" \
-			"${url}" \
-			|| die "Cannot download ${url}"
+		geturl ${url} || die "Cannot download ${url}"
 	fi
 }
 
