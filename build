@@ -64,13 +64,13 @@ restore_la() {
 }
 
 geturl() {
-	if [ ! -z $(which ${WGET}) ]; then
+	if [ -n "${WGET_MODE}" ]; then
 		"${WGET}" ${WGET_OPTS} --directory-prefix="${SOURCESROOT}" "${url}"
 	else
-		echo "Fetching: ${url}"
-		file=$(basename ${url})
-		"${CURL}" ${CURL_OPTS} --progress-bar --remote-name "${url}"
-		mv "$file" "${SOURCESROOT}"
+		(
+			cd "${SOURCESROOT}" && \
+				"${CURL}" ${CURL_OPTS} "${url}"
+		)
 	fi
 }
 
@@ -330,7 +330,11 @@ IMAGEROOT="${IMAGEROOT:-${SCRIPTROOT}/image}"
 BUILDROOT="${BUILDROOT:-${SCRIPTROOT}/tmp}"
 SOURCESROOT="${SOURCESROOT:-${SCRIPTROOT}/sources}"
 PATCHDIR="${SCRIPTROOT}/patches"
+
+. "${SCRIPTROOT}/build.vars" || die "Cannot source build.vars"
+
 echo "${CHOST:-$(gcc -dumpmachine)}" | grep mingw > /dev/null && BUILD_FOR_WINDOWS=1
+which "${WGET}" > /dev/null 2>&1 && WGET_MODE=1
 
 CONFIGOPTS=" \
 	--prefix=/ \
@@ -340,8 +344,6 @@ CONFIGOPTS=" \
 	--build=${CBUILD} \
 	--program-prefix='' \
 "
-
-. "${SCRIPTROOT}/build.vars" || die "Cannot source build.vars"
 
 OPENSC_ROOT="${IMAGEROOT}/opensc"
 ENGINE_PKCS11_ROOT="${IMAGEROOT}/engine_pkcs11"
