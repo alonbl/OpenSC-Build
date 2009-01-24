@@ -10,6 +10,7 @@
 # we can pass to the 'Configure' script.
 
 #@ALON: Add mingw support
+#@ALON: Add darwin support
 #@ALON: Remove bash so we can work on msys
 #@ALON: Set CHOST if missing
 
@@ -55,6 +56,7 @@ case ${CHOST} in
 	x86_64-*-mingw*)	system="mingw64";;
 	*-linux*)    system="linux";;
 	*-freebsd*)  system="BSD";;
+	*-apple*)    system="darwin";;
 	*)           exit 0;;
 esac
 
@@ -105,6 +107,15 @@ BSD)
 		sparc64*)     machine=sparc64;;
 		x86_64*)      machine=x86_64;;
 		*)            machine=generic32;;
+	esac
+	;;
+darwin)
+	case ${chost_machine} in
+		i[6-9]86*)    machine=i386-cc;;
+		x86_64*)      system=darwin64; machine=x86_64-cc;;
+		powerpc64*)   system=darwin64; machine=ppc64-cc;;
+		powerpc*)     machine=ppc-cc;;
+		*)            machine=error;;
 	esac
 	;;
 esac
