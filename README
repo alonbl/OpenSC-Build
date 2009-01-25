@@ -63,3 +63,6 @@ Environment
 
 	OPENSC_COMPONENTS
 		pcsc, openct
+	
+	OPENSC_TARGET_ROOT
+		Target OpenSC root, default /

@@ -145,7 +145,7 @@ build_dep() {
 			die "make zlib"
 	else
 		CHOST="${CHOST}" LDCONFIG=true CFLAGS="${CFLAGS} -fPIC -fpic -s" \
-			./configure --shared --prefix=/ || die "configure zlib"
+			./configure --shared --prefix="${OPENSC_TARGET_ROOT}" || die "configure zlib"
 		${MAKE} install DESTDIR="${OPENSC_ROOT}" || die "make zlib"
 	fi
 
@@ -172,7 +172,7 @@ build_dep() {
 	echo "Build openssl"
 	cd "${BUILDROOT}/openssl"* || die "cd openssl"
 
-	./Configure --prefix="//" --cross-compile-prefix=${CHOST:+${CHOST}-} \
+	./Configure --prefix="/${OPENSC_TARGET_ROOT}" --cross-compile-prefix=${CHOST:+${CHOST}-} \
 		shared $(CHOST="${CHOST}" "${SCRIPTROOT}/gentoo.config-0.9.8") \
 		zlib-dynamic ${ZLIB_CFLAGS} \
 		no-capieng \
@@ -337,8 +337,7 @@ echo "${CHOST:-$(gcc -dumpmachine)}" | grep mingw > /dev/null && BUILD_FOR_WINDO
 which "${WGET}" > /dev/null 2>&1 && WGET_MODE=1
 
 CONFIGOPTS=" \
-	--prefix=/ \
-	--sbindir=/bin \
+	--prefix=${OPENSC_TARGET_ROOT} \
 	--host=${CHOST} \
 	--target=${CTARGET} \
 	--build=${CBUILD} \
@@ -372,6 +371,10 @@ export PKCS11_HELPER_CFLAGS="-I${OPENVPN_ROOT}/include"
 export PKCS11_HELPER_LIBS="-L${OPENVPN_ROOT}/lib -lpkcs11-helper"
 
 if [ -n "${BUILD_FOR_WINDOWS}" ]; then
+	CONFIGOPTS=" \
+		${CONFIGOPTS} \
+		--sbindir=/bin \
+	"
 	OPENSC_COMPONENTS="pcsc"
 	export PKG_CONFIG="true"
 	export MAN2HTML="true"
