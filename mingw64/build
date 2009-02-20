@@ -11,7 +11,7 @@ get_full_path() {
 	( cd "${d}" 2> /dev/null && pwd || echo "${d}" )
 }
 
-CHOST="x86_64-pc-mingw32"
+CTARGET="x86_64-pc-mingw32"
 MAKE="${MAKE:-make}"
 MAKEOPTS="${MAKEOPTS:--j2}"
 SCRIPTROOT="$(get_full_path "$(dirname "$0")")"
@@ -55,26 +55,27 @@ for d in \
 	fi
 done
 
+mkdir -p "${BUILDROOT}/gmp"
+cd "${BUILDROOT}/gmp"
+"${GMP_SRC}/configure" \
+	--prefix="${TOOLCHAIN_ROOT}" \
+	|| die "gmp.configure"
+${MAKE} ${MAKEOPTS} || die "gmp.make"
+${MAKE} ${MAKEOPTS} install || die "gmp.install"
+
 mkdir -p "${BUILDROOT}/mpfr"
 cd "${BUILDROOT}/mpfr"
 "${MPFR_SRC}/configure" \
-	--prefix="${TOOLCHAIN_ROOT}" ||
-	die "mpfr.configure"
+	--prefix="${TOOLCHAIN_ROOT}" \
+	--with-gmp="${TOOLCHAIN_ROOT}" \
+	|| die "mpfr.configure"
 ${MAKE} ${MAKEOPTS} || die "mpfr.make"
 ${MAKE} ${MAKEOPTS} install || die "mpfr.install"
-
-mkdir -p "${BUILDROOT}/gmp"
-cd "${BUILDROOT}/gmp"
-"${MPFR_SRC}/configure" \
-	--prefix="${TOOLCHAIN_ROOT}" ||
-	die "gmp.configure"
-${MAKE} ${MAKEOPTS} || die "gmp.make"
-${MAKE} ${MAKEOPTS} install || die "gmp.install"
 
 mkdir -p "${BUILDROOT}/binutils"
 cd "${BUILDROOT}/binutils"
 "${BINUTILS_SRC}/configure" \
-	--target="${CHOST}" \
+	--target="${CTARGET}" \
 	--prefix="${TOOLCHAIN_ROOT}" \
 	--with-sysroot="${SYSROOT}" \
 	--without-x \
@@ -83,14 +84,14 @@ cd "${BUILDROOT}/binutils"
 ${MAKE} ${MAKEOPTS} all-host || die "binutils.make.1"
 ${MAKE} ${MAKEOPTS} install-host || die "binutils.install.1"
 
-svn export "${MINGW_W64_SRC}/mingw-w64-headers/include" "${TOOLCHAIN_ROOT}/${CHOST}/include" || die "mingw-w64-headers.install"
+svn export "${MINGW_W64_SRC}/mingw-w64-headers/include" "${TOOLCHAIN_ROOT}/${CTARGET}/include" || die "mingw-w64-headers.install"
 mkdir -p "${SYSROOT}"
-ln -s "${TOOLCHAIN_ROOT}/${CHOST}" "${SYSROOT}/mingw" || die "ln"
+ln -s "${TOOLCHAIN_ROOT}/${CTARGET}" "${SYSROOT}/mingw" || die "ln"
 
 mkdir -p "${BUILDROOT}/gcc"
 cd "${BUILDROOT}/gcc"
 "${GCC_SRC}/configure" \
-	--target="${CHOST}" \
+	--target="${CTARGET}" \
 	--prefix="${TOOLCHAIN_ROOT}" \
 	--with-sysroot="${SYSROOT}" \
 	--enable-languages="c,c++" \
@@ -105,7 +106,7 @@ export PATH="${TOOLCHAIN_ROOT}/bin:${PATH}"
 mkdir -p "${BUILDROOT}/mingw-w64-crt"
 cd "${BUILDROOT}/mingw-w64-crt"
 "${MINGW_W64_SRC}/mingw-w64-crt/configure" \
-	--host="${CHOST}" \
+	--host="${CTARGET}" \
 	--prefix="${TOOLCHAIN_ROOT}" \
 	--with-sysroot="${SYSROOT}" \
 	|| die "mingw-w64-crt.configure"
