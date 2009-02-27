@@ -113,21 +113,40 @@ extract() {
 	local f
 
 	for f in "${SOURCESROOT}"/*; do
-		local extra=""
+		local extract=""
 		echo "Extract '$f'"
-		echo "$f" | grep -q '\.bz2' && extra="${extra}j"
-		echo "$f" | grep -q '\.gz' && extra="${extra}z"
-		tar -C "${BUILDROOT}" -x${extra}f "${f}" || die "Extract '${f}'"
+		case "${f}" in
+			*.gz)
+				extract="gunzip -c"
+			;;
+			*.bz2)
+				extract="bunzip2 -c"
+			;;
+			*.lzma)
+				extract="unlzma"
+			;;
+			*)
+				extract="cat"
+			;;
+		esac
+		${extract} < "${f}" | tar -C "${BUILDROOT}" -xf - || die "Extract '${f}'"
 	done
 
-	for f in "${PATCHDIR}"/*; do
-		product="$(echo "${f}" | sed -e 's#.*/##g' -e 's/-.*//g')"
+	for f in "${PATCHDIR}"/*.patch "${PATCHDIR}"/*.sh; do
+		product="$(echo "${f}" | sed -e 's#.*/##g' -e 's/-[0-9].*//g')"
 		if [ -d "${BUILDROOT}/${product}"* ]; then
-			echo "Patch: '$f'"
-			patch -d "${BUILDROOT}/${product}"* -p1 < "${f}" || die "Patch '${f}'"
+			if echo "${f}" | grep '.patch$' > /dev/null; then
+				echo "Patch: '$f'"
+				patch -d "${BUILDROOT}/${product}"* -p1 < "${f}" || die "Patch '${f}'"
+			else
+				echo "Running: '$f'"
+				$( cd "${BUILDROOT}/${product}"*; "${f}" ) || die "Patch '${f}'"
+			fi
 		fi
 	done
+}
 
+fixup_win64_libtool() {
 	# Fix win64 libtool
 	find "${BUILDROOT}" -name ltmain.sh | xargs sed -i 's/architecture: i386)?'\''/architecture: i386)?|file format pe-x86-64'\''/'
 }
@@ -386,6 +405,7 @@ fi
 download
 create_layout
 extract
+fixup_win64_libtool
 build_dep
 build_opensc
 build_engine_pkcs11
