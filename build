@@ -148,7 +148,10 @@ extract() {
 
 fixup_win64_libtool() {
 	# Fix win64 libtool
-	find "${BUILDROOT}" -name ltmain.sh | xargs sed -i 's/architecture: i386)?'\''/architecture: i386)?|file format pe-x86-64'\''/'
+	find "${BUILDROOT}" -name ltmain.sh | while read f; do
+		sed 's/architecture: i386)?'\''/architecture: i386)?|file format pe-x86-64'\''/' < "${f}" > "${f}.tmp"
+		mv "${f}.tmp" "${f}"
+	done
 }
 
 build_dep() {
