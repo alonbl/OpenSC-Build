@@ -1,0 +1,12 @@
+Index: a/src/libp11.exports
+===================================================================
+--- a/src/libp11.exports	(revision 181)
++++ b/src/libp11.exports	(revision 182)
+@@ -16,6 +16,7 @@
+ PKCS11_get_key_exponent
+ PKCS11_get_private_key
+ PKCS11_get_public_key
++PKCS11_get_slotid_from_slot
+ PKCS11_find_certificate
+ PKCS11_find_key
+ PKCS11_enumerate_certs
