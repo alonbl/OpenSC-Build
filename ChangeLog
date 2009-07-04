@@ -4,7 +4,7 @@ Copyright (c) 2008 Alon Bar-Lev <alon.barlev@gmail.com>
 
 $Id$
 
-????-??-?? - Version 005
+2009-07-04 - Version 005
 
  * Components versions:
 
@@ -12,13 +12,13 @@ $Id$
 	zlib-1.2.3
 	libiconv-1.12
 	lzo-2.02
-	openssl-1.0.0.beta1
-	openct-0.6.15 (optional)
-	opensc-0.11.6
-	libp11-0.2.4
-	engine_pkcs11-0.1.5
+	openssl-1.0.0.beta2
+	openct-0.6.16 (optional)
+	opensc-0.11.8
+	libp11-0.2.5
+	engine_pkcs11-0.1.6
 	pkcs11-helper-1.07
-	openvpn-2.1_rc15
+	openvpn-2.1_rc18
 
 2009-03-07 - Version 004
 
