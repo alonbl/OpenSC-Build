@@ -3,30 +3,10 @@ Remove faulty sed pattern for mingw sed 3.0.2.
 
 ---
 
-diff -ur tmp/libiconv-1.12/windows/windres-options src/libiconv-1.12/windows/windres-options
---- src/libiconv-1.12/windows/windres-options 2007-05-27 19:42:10 +0100
-+++ libiconv-1.12/windows/windres-options 2008-06-30 15:27:31 +0100
-@@ -13,28 +13,11 @@
-   shift
- fi
- version="$1" # something like 2.0 or 2.17 or 2.17.3 or 2.17.3-pre3
--
--sed_extract_major='/^[0-9]/{s/^\([0-9]*\).*/\1/p;q}
--a\
--0
--q
--'
--sed_extract_minor='/^[0-9][0-9]*[.][0-9]/{s/^[0-9]*[.]\([0-9]*\).*/\1/p;q}
--a\
--0
--q
--'
--sed_extract_subminor='/^[0-9][0-9]*[.][0-9][0-9]*[.][0-9]/{s/^[0-9]*[.][0-9]*[.]\([0-9]*\).*/\1/p;q}
--a\
--0
--q
--'
--
+--- a/windows/windres-options	2009-06-21 14:17:33.000000000 +0300
++++ b/windows/windres-options	2009-10-10 02:19:57.457105218 +0200
+@@ -32,9 +32,9 @@ q
+ 
  {
    echo "-DPACKAGE_VERSION_STRING=\"${version}\""
 -  echo "-DPACKAGE_VERSION_MAJOR="`echo "${version}" | sed -n -e "$sed_extract_major"`
