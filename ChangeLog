@@ -4,37 +4,52 @@ Copyright (c) 2008-2009 Alon Bar-Lev <alon.barlev@gmail.com>
 
 $Id$
 
+2009-10-20 - Version 007
+
+-	libiconv-1.12
++	libiconv-1.13.1
+-	opensc-0.11.9
++	opensc-0.11.10
+-	openct-0.6.17 (optional)
++	openct-0.6.18 (optional)
+-	libp11-0.2.6
++	libp11-0.2.7
+-	engine_pkcs11-0.1.6
++	engine_pkcs11-0.1.7
+-	openvpn-2.1_rc19
++	openvpn-2.1_rc20
+
 2009-07-29 - Version 006
 
  * Components versions:
 
-	libtool-1.5.26
-	zlib-1.2.3
-	libiconv-1.12
-	lzo-2.02
-	openssl-1.0.0.beta3
-	openct-0.6.17 (optional)
-	opensc-0.11.9
-	libp11-0.2.6
-	engine_pkcs11-0.1.6
-	pkcs11-helper-1.07
-	openvpn-2.1_rc19
+-	openssl-1.0.0.beta2
++	openssl-1.0.0.beta3
+-	openct-0.6.16 (optional)
++	openct-0.6.17 (optional)
+-	opensc-0.11.8
++	opensc-0.11.9
+-	libp11-0.2.5
++	libp11-0.2.6
+-	openvpn-2.1_rc18
++	openvpn-2.1_rc19
 
 2009-07-04 - Version 005
 
  * Components versions:
 
-	libtool-1.5.26
-	zlib-1.2.3
-	libiconv-1.12
-	lzo-2.02
-	openssl-1.0.0.beta2
-	openct-0.6.16 (optional)
-	opensc-0.11.8
-	libp11-0.2.5
-	engine_pkcs11-0.1.6
-	pkcs11-helper-1.07
-	openvpn-2.1_rc18
+-	openssl-SNAP-20080826
++	openssl-1.0.0.beta2
+-	openct-0.6.15 (optional)
++	openct-0.6.16 (optional)
+-	opensc-0.11.7
++	opensc-0.11.8
+-	libp11-0.2.4
++	libp11-0.2.5
+-	engine_pkcs11-0.1.5
++	engine_pkcs11-0.1.6
+-	openvpn-2.1_rc15
++	openvpn-2.1_rc18
 
 2009-03-07 - Version 004
 
@@ -44,32 +59,22 @@ $Id$
 
  * Components versions:
 
-	libtool-1.5.26
-	zlib-1.2.3
-	libiconv-1.12
-	lzo-2.02
-	openssl-SNAP-20090226
-	openct-0.6.15 (optional)
-	opensc-0.11.6
-	libp11-0.2.4
-	engine_pkcs11-0.1.5
-	pkcs11-helper-1.07
-	openvpn-2.1_rc15
++	libiconv-1.12
+-	opensc-0.11.6
++	opensc-0.11.7
+-	pkcs11-helper-1.06
++	pkcs11-helper-1.07
+-	openvpn-2.1_rc8
++	openvpn-2.1_rc15
 
 2008-08-27 - Version 002
 
  * Components versions:
 
-	libtool-1.5.26
-	zlib-1.2.3
-	lzo-2.02
-	openssl-SNAP-20080826
-	openct-0.6.15 (optional)
-	opensc-0.11.6
-	libp11-0.2.4
-	engine_pkcs11-0.1.5
-	pkcs11-helper-1.06
-	openvpn-2.1_rc8
+-	openssl-SNAP-20080730
++	openssl-SNAP-20080826
+-	opensc-0.11.6
++	opensc-0.11.6
 
 2008-07-31 - Version 001
 

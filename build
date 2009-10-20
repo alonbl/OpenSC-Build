@@ -24,9 +24,10 @@
 # WGET=/c/msys/1.0/bin/wget
 #
 # Cross compile for Windows:
-# CHOST=i686-pc-mingw32 CBUILD=i686-pc-linux-gnu
+# IMAGEROOT=`pwd`/image-win32 CHOST=i686-w32-mingw32 CBUILD=x86_64-pc-linux-gnu ./build
+# IMAGEROOT=`pwd`/image-win64 CHOST=x86_64-w64-mingw32 PATH=`pwd`/mingw64/toolchain/bin:$PATH CBUILD=x86_64-pc-linux-gnu ./build
 # Cross compile for uClibc:
-# CHOST=i586-pc-linux-uclibc CBUILD=i686-pc-linux-gnu
+# CHOST=i586-pc-linux-uclibc CBUILD=i686-pc-linux-gnu ./build
 #
 
 die() {
