@@ -24,8 +24,8 @@ TOOLCHAIN_ROOT="${SCRIPTROOT}/toolchain"
 
 MPFR_SRC="${MPFR_SRC:-${SOURCESROOT}/mpfr-2.4.1}"
 GMP_SRC="${GMP_SRC:-${SOURCESROOT}/gmp-4.3.1}"
-BINUTILS_SRC="${BINUTILS_SRC:-${SOURCESROOT}/binutils-2.19.1}"
-GCC_SRC="${GCC_SRC:-${SOURCESROOT}/gcc-4.4.1}"
+BINUTILS_SRC="${BINUTILS_SRC:-${SOURCESROOT}/binutils-2.20}"
+GCC_SRC="${GCC_SRC:-${SOURCESROOT}/gcc-4.4.2}"
 MINGW_W64_SRC="${MINGW_W64_SRC:-${SOURCESROOT}/mingw-w64}"
 
 MPFR_SRC="$(get_full_path "${MPFR_SRC}")"
@@ -90,7 +90,15 @@ cd "${BUILDROOT}/binutils"
 ${MAKE} ${MAKEOPTS} all-host || die "binutils.make.1"
 ${MAKE} ${MAKEOPTS} install-host || die "binutils.install.1"
 
-svn export "${MINGW_W64_SRC}/mingw-w64-headers/include" "${TOOLCHAIN_ROOT}/${CTARGET}/include" || die "mingw-w64-headers.install"
+mkdir -p "${BUILDRIIT}/mingw-w64-headers"
+cd "${BUILDRIIT}/mingw-w64-headers"
+"${MINGW_W64_SRC}/mingw-w64-headers/configure" \
+	--host="${CTARGET}" \
+	--prefix="${TOOLCHAIN_ROOT}" \
+	--with-sdks=none \
+	|| die "mingw-w64-headers.configure"
+${MAKE} ${MAKEOPTS} install || die "mingw-w64-headers.install"
+
 mkdir -p "${SYSROOT}"
 ln -s "${TOOLCHAIN_ROOT}/${CTARGET}" "${SYSROOT}/${CTARGET}" || die "ln"
 ln -s "${CTARGET}" "${SYSROOT}/mingw" || die "ln"
