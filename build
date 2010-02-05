@@ -232,9 +232,14 @@ build_opensc() {
 		fixup_la
 	fi
 
+	if [ -n "${BUILD_FOR_WINDOWS}" ]; then
+		extra_opensc="${extra_opensc} --enable-cardmod"
+	fi
+
 	echo "Build opensc"
 	cd "${BUILDROOT}/opensc"* || die "cd opensc"
 	./configure ${CONFIGOPTS} ${EXTRA_OPENSC_CONFIG} \
+		CFLAGS="${CFLAGS} --include=cardmod-mingw-compat.h -I${SCRIPTROOT}/include" \
 		--enable-openssl --enable-zlib ${extra_opensc} --enable-doc \
 		|| die "Configure opensc"
 	${MAKE} ${MAKEOPTS} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${OPENSC_ROOT}" || die "make opensc"
