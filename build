@@ -349,6 +349,12 @@ pack() {
 	tar -cjf "${IMAGEROOT}/opensc-${X}-${BUILD_VERSION}-openvpn.tar.bz2" -C "${OPENVPN_ROOT}" . || die "openvpn"
 }
 
+nsis() {
+	echo "Make windows install"
+	sed "s/@BUILD_VERSION@/${BUILD_VERSION}/g" ${SCRIPTROOT}/nsis/opensc-setup.nsi.in > ${IMAGEROOT}/opensc-setup.nsi  
+	${MAKENSIS} ${IMAGEROOT}/opensc-setup.nsi  || die 'makensis'
+}
+
 SCRIPTROOT="$(get_full_path "$(dirname "$0")")"
 
 #CHOST
@@ -424,5 +430,7 @@ copy_sources
 clean_empty_dirs
 fixup_libtool_win_strip
 pack
+
+[ -n "${BUILD_FOR_WINDOWS}" ] && nsis
 
 exit 0
