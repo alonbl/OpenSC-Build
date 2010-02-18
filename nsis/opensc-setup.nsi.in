@@ -62,6 +62,10 @@ Section "opensc (required)"
   ; Add to PATH
   ${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$INSTDIR\bin"
   
+  ; Run opensc-install.bat
+  ExecWait '"$INSTDIR\bin\opensc-install.bat"' $0
+  DetailPrint "opensc-install returned $0"
+  
 SectionEnd
 
 Section "engine pkcs11"
