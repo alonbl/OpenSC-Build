@@ -232,9 +232,10 @@ build_opensc() {
 		fixup_la
 	fi
 
-	if [ -n "${BUILD_FOR_WINDOWS}" ]; then
-		extra_opensc="${extra_opensc} --enable-cardmod"
-	fi
+# Disable until we solve license issue
+#	if [ -n "${BUILD_FOR_WINDOWS}" ]; then
+#		extra_opensc="${extra_opensc} --enable-cardmod"
+#	fi
 
 	echo "Build opensc"
 	cd "${BUILDROOT}/opensc"* || die "cd opensc"
@@ -431,6 +432,7 @@ clean_empty_dirs
 fixup_libtool_win_strip
 pack
 
-[ -n "${BUILD_FOR_WINDOWS}" ] && nsis
+# disable this until we have nsis working on x86_64
+#[ -n "${BUILD_FOR_WINDOWS}" ] && nsis
 
 exit 0
