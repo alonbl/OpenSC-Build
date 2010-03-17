@@ -1,11 +1,6 @@
-
-Support cross compile.
-
----
-
-diff -urNp zlib-1.2.3.org/win32/Makefile.gcc zlib-1.2.3/win32/Makefile.gcc
---- zlib-1.2.3.org/win32/Makefile.gcc	2003-08-02 06:49:00.000000000 +0300
-+++ zlib-1.2.3/win32/Makefile.gcc	2008-10-20 11:58:58.000000000 +0200
+diff -urNp zlib-1.2.4.org/win32/Makefile.gcc zlib-1.2.4/win32/Makefile.gcc
+--- zlib-1.2.4.org/win32/Makefile.gcc	2010-02-23 18:00:23.000000000 +0200
++++ zlib-1.2.4/win32/Makefile.gcc	2010-03-17 15:43:28.332296998 +0200
 @@ -30,7 +30,8 @@ IMPLIB    = libzdll.a
  #LOC = -DASMV
  #LOC = -DDEBUG -g
@@ -16,7 +11,7 @@ diff -urNp zlib-1.2.3.org/win32/Makefile.gcc zlib-1.2.3/win32/Makefile.gcc
  CFLAGS = $(LOC) -O3 -Wall
  
  AS = $(CC)
-@@ -39,10 +40,10 @@ ASFLAGS = $(LOC) -Wall
+@@ -39,13 +40,13 @@ ASFLAGS = $(LOC) -Wall
  LD = $(CC)
  LDFLAGS = $(LOC) -s
  
@@ -28,32 +23,24 @@ diff -urNp zlib-1.2.3.org/win32/Makefile.gcc zlib-1.2.3/win32/Makefile.gcc
 +RC = $(PREFIX)windres
  RCFLAGS = --define GCC_WINDRES
  
+-STRIP = strip
++STRIP = $(PREFIX)strip
+ 
  CP = cp -fp
-@@ -79,9 +80,9 @@ $(STATICLIB): $(OBJS) $(OBJA)
- $(IMPLIB): $(SHAREDLIB)
- 
- $(SHAREDLIB): win32/zlib.def $(OBJS) $(OBJA) zlibrc.o
--	dllwrap --driver-name $(CC) --def win32/zlib.def \
-+	$(PREFIX)dllwrap --driver-name $(CC) --def win32/zlib.def \
- 	  --implib $(IMPLIB) -o $@ $(OBJS) $(OBJA) zlibrc.o
--	strip $@
-+	$(PREFIX)strip $@
- 
- example: example.o $(STATICLIB)
- 	$(LD) $(LDFLAGS) -o $@ example.o $(STATICLIB)
-@@ -99,23 +100,26 @@ zlibrc.o: win32/zlib1.rc
+ # If GNU install is available, replace $(CP) with install.
+@@ -101,23 +102,26 @@ zlibrc.o: win32/zlib1.rc
  	$(RC) $(RCFLAGS) -o $@ win32/zlib1.rc
  
  
 -# INCLUDE_PATH and LIBRARY_PATH must be set.
-+# INCLUDE_PATH, LIBRARY_PATH and BININARY_PATH must be set.
++# BINARY_PATH, INCLUDE_PATH and LIBRARY_PATH must be set.
  
  .PHONY: install uninstall clean
  
 -install: zlib.h zconf.h $(LIB)
++install: all zlib.h zconf.h $(LIB)
 -	-@if not exist $(INCLUDE_PATH)/nul mkdir $(INCLUDE_PATH)
 -	-@if not exist $(LIBRARY_PATH)/nul mkdir $(LIBRARY_PATH)
-+install: zlib.h zconf.h $(STATICLIB) $(IMPLIB)
 +	-mkdir -p $(INCLUDE_PATH)
 +	-mkdir -p $(LIBRARY_PATH)
 +	-mkdir -p $(BINARY_PATH)

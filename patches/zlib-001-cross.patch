@@ -1,32 +1,32 @@
---- zlib-1.2.3.org/configure	2005-07-11 23:11:57.000000000 +0300
-+++ zlib-1.2.3.x/configure	2008-05-07 12:55:17.000000000 +0300
-@@ -18,13 +18,23 @@
+diff -urNp zlib-1.2.4.org/configure zlib-1.2.4/configure
+--- zlib-1.2.4.org/configure	2010-03-12 17:06:14.000000000 +0200
++++ zlib-1.2.4/configure	2010-03-17 16:23:47.556136194 +0200
+@@ -13,15 +13,21 @@
  # If you have problems, try without defining CC and CFLAGS before reporting
  # an error.
  
 +if [ -n "${CHOST}" ]; then
-+	system="$(echo "${CHOST}" | sed 's/.*-.*-\(.*\)-.*/\1/')"
-+	arch="$(echo "${CHOST}" | sed 's/-.*//')"
++	uname="$(echo "${CHOST}" | sed 's/.*-.*-\(.*\)-.*/\1/')"
 +	CROSS_PREFIX="${CHOST}-"
-+else
-+	system=`(uname -s 2> /dev/null || echo unknown)`
-+	arch=`(uname -m 2> /dev/null || echo unknown)`
 +fi
 +
- LIBS=libz.a
- LDFLAGS="-L. ${LIBS}"
+ STATICLIB=libz.a
+ LDFLAGS="${LDFLAGS} -L. ${STATICLIB}"
  VER=`sed -n -e '/VERSION "/s/.*"\(.*\)".*/\1/p' < zlib.h`
+ VER3=`sed -n -e '/VERSION "/s/.*"\([0-9]*\\.[0-9]*\\.[0-9]*\).*/\1/p' < zlib.h`
  VER2=`sed -n -e '/VERSION "/s/.*"\([0-9]*\\.[0-9]*\)\\..*/\1/p' < zlib.h`
  VER1=`sed -n -e '/VERSION "/s/.*"\([0-9]*\)\\..*/\1/p' < zlib.h`
--AR=${AR-"ar rc"}
+-AR=${AR-"ar"}
+-AR_RC="${AR} rc"
 -RANLIB=${RANLIB-"ranlib"}
-+AR=${AR-"${CROSS_PREFIX}ar rc"}
++AR=${AR-"${CROSS_PREFIX}ar"}
++AR_RC=${AR_RC-"${CROSS_PREFIX}ar rc"}
 +RANLIB=${RANLIB-"${CROSS_PREFIX}ranlib"}
 +LDCONFIG=${LDCONFIG-"ldconfig"}
  prefix=${prefix-/usr/local}
  exec_prefix=${exec_prefix-'${prefix}'}
  libdir=${libdir-'${exec_prefix}/lib'}
-@@ -64,7 +74,7 @@ int hello() {return getchar();}
+@@ -69,7 +75,7 @@ int hello() {return getchar();}
  EOF
  
  test -z "$CC" && echo Checking for gcc...
@@ -35,49 +35,26 @@
  cflags=${CFLAGS-"-O3"}
  # to force the asm version use: CFLAGS="-O3 -DASMV" ./configure
  case "$cc" in
-@@ -75,7 +85,7 @@ if test "$gcc" -eq 1 && ($cc -c $cflags 
-   CC="$cc"
-   SFLAGS=${CFLAGS-"-fPIC -O3"}
-   CFLAGS="$cflags"
--  case `(uname -s || echo unknown) 2>/dev/null` in
-+  case $system in
-   Linux | linux | GNU | GNU/*) LDSHARED=${LDSHARED-"$cc -shared -Wl,-soname,libz.so.1"};;
+@@ -91,7 +97,7 @@ if test "$gcc" -eq 1 && ($cc -c $cflags 
+     uname=`(uname -s || echo unknown) 2>/dev/null`
+   fi
+   case "$uname" in
+-  Linux | linux | GNU | GNU/* | *BSD | DragonFly) LDSHARED=${LDSHARED-"$cc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map"} ;;
++  Linux* | linux* | GNU | GNU/* | *BSD | DragonFly) LDSHARED=${LDSHARED-"$cc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map"} ;;
    CYGWIN* | Cygwin* | cygwin* | OS/2* )
-              EXE='.exe';;
-@@ -84,7 +94,7 @@ if test "$gcc" -eq 1 && ($cc -c $cflags 
-                  LDSHARED=${LDSHARED-"$cc -shared -Wl,-hlibz.so.1"};;
-   HP-UX*)
-          LDSHARED=${LDSHARED-"$cc -shared $SFLAGS"}
--         case `(uname -m || echo unknown) 2>/dev/null` in
-+         case $arch in
-          ia64)
-                  shared_ext='.so'
-                  SHAREDLIB='libz.so';;
-@@ -102,12 +112,12 @@ if test "$gcc" -eq 1 && ($cc -c $cflags 
- else
-   # find system name and corresponding cc options
-   CC=${CC-cc}
--  case `(uname -sr || echo unknown) 2>/dev/null` in
-+  case $system in
-   HP-UX*)    SFLAGS=${CFLAGS-"-O +z"}
-              CFLAGS=${CFLAGS-"-O"}
- #            LDSHARED=${LDSHARED-"ld -b +vnocompatwarnings"}
-              LDSHARED=${LDSHARED-"ld -b"}
--         case `(uname -m || echo unknown) 2>/dev/null` in
-+         case $arch in
-          ia64)
-              shared_ext='.so'
-              SHAREDLIB='libz.so';;
-@@ -449,6 +459,7 @@ sed < Makefile.in "
+              EXE='.exe' ;;
+   QNX*)  # This is for QNX6. I suppose that the QNX rule below is for QNX2,QNX4
+@@ -513,6 +519,7 @@ sed < Makefile.in "
  /^SHAREDLIBM *=/s#=.*#=$SHAREDLIBM#
- /^AR *=/s#=.*#=$AR#
+ /^AR *=/s#=.*#=$AR_RC#
  /^RANLIB *=/s#=.*#=$RANLIB#
 +/^LDCONFIG *=/s#=.*#=$LDCONFIG#
  /^EXE *=/s#=.*#=$EXE#
  /^prefix *=/s#=.*#=$prefix#
  /^exec_prefix *=/s#=.*#=$exec_prefix#
---- zlib-1.2.3.org/Makefile.in	2005-07-18 05:25:21.000000000 +0300
-+++ zlib-1.2.3.x/Makefile.in	2008-05-07 12:54:24.000000000 +0300
+diff -urNp zlib-1.2.4.org/Makefile.in zlib-1.2.4/Makefile.in
+--- zlib-1.2.4.org/Makefile.in	2010-03-14 04:10:27.000000000 +0200
++++ zlib-1.2.4/Makefile.in	2010-03-17 16:03:32.182849536 +0200
 @@ -16,6 +16,7 @@
  # To install in $HOME instead of /usr/local, use:
  #    make install prefix=$HOME
@@ -86,53 +63,12 @@
  CC=cc
  
  CFLAGS=-O
-@@ -90,33 +91,33 @@ minigzip$(EXE): minigzip.o $(LIBS)
- 	$(CC) $(CFLAGS) -o $@ minigzip.o $(LDFLAGS)
- 
- install: $(LIBS)
--	-@if [ ! -d $(exec_prefix) ]; then mkdir -p $(exec_prefix); fi
--	-@if [ ! -d $(includedir)  ]; then mkdir -p $(includedir); fi
--	-@if [ ! -d $(libdir)      ]; then mkdir -p $(libdir); fi
--	-@if [ ! -d $(man3dir)     ]; then mkdir -p $(man3dir); fi
--	cp zlib.h zconf.h $(includedir)
--	chmod 644 $(includedir)/zlib.h $(includedir)/zconf.h
--	cp $(LIBS) $(libdir)
--	cd $(libdir); chmod 755 $(LIBS)
--	-@(cd $(libdir); $(RANLIB) libz.a || true) >/dev/null 2>&1
--	cd $(libdir); if test -f $(SHAREDLIBV); then \
-+	-@if [ ! -d $(DESTDIR)$(exec_prefix) ]; then mkdir -p $(DESTDIR)$(exec_prefix); fi
-+	-@if [ ! -d $(DESTDIR)$(includedir)  ]; then mkdir -p $(DESTDIR)$(includedir); fi
-+	-@if [ ! -d $(DESTDIR)$(libdir)      ]; then mkdir -p $(DESTDIR)$(libdir); fi
-+	-@if [ ! -d $(DESTDIR)$(man3dir)     ]; then mkdir -p $(DESTDIR)$(man3dir); fi
-+	cp zlib.h zconf.h $(DESTDIR)$(includedir)
-+	chmod 644 $(DESTDIR)$(includedir)/zlib.h $(DESTDIR)$(includedir)/zconf.h
-+	cp $(LIBS) $(DESTDIR)$(libdir)
-+	cd $(DESTDIR)$(libdir); chmod 755 $(LIBS)
-+	-@(cd $(DESTDIR)$(libdir); $(RANLIB) libz.a || true) >/dev/null 2>&1
-+	cd $(DESTDIR)$(libdir); if test -f $(SHAREDLIBV); then \
+@@ -171,7 +172,7 @@ install-libs: $(LIBS)
  	  rm -f $(SHAREDLIB) $(SHAREDLIBM); \
  	  ln -s $(SHAREDLIBV) $(SHAREDLIB); \
  	  ln -s $(SHAREDLIBV) $(SHAREDLIBM); \
 -	  (ldconfig || true)  >/dev/null 2>&1; \
 +	  ($(LDCONFIG) || true)  >/dev/null 2>&1; \
  	fi
--	cp zlib.3 $(man3dir)
--	chmod 644 $(man3dir)/zlib.3
-+	cp zlib.3 $(DESTDIR)$(man3dir)
-+	chmod 644 $(DESTDIR)$(man3dir)/zlib.3
- # The ranlib in install is needed on NeXTSTEP which checks file times
- # ldconfig is for Linux
- 
- uninstall:
--	cd $(includedir); \
--	cd $(libdir); rm -f libz.a; \
-+	cd $(DESTDIR)$(includedir); \
-+	cd $(DESTDIR)$(libdir); rm -f libz.a; \
- 	if test -f $(SHAREDLIBV); then \
- 	  rm -f $(SHAREDLIBV) $(SHAREDLIB) $(SHAREDLIBM); \
- 	fi
--	cd $(man3dir); rm -f zlib.3
-+	cd $(DESTDIR)$(man3dir); rm -f zlib.3
- 
- mostlyclean: clean
- clean:
+ 	cp zlib.3 $(DESTDIR)$(man3dir)
+ 	chmod 644 $(DESTDIR)$(man3dir)/zlib.3
