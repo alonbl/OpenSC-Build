@@ -1,13 +1,11 @@
 
-!include "..\nsis\EnvVarUpdate.nsh"
-
-!define VERSION @BUILD_VERSION@
+!include "EnvVarUpdate.nsh"
 
 ; The name of the installer
 Name "opensc"
 
 ; The file to write
-OutFile "opensc-setup-${VERSION}.exe"
+OutFile "${IMAGEROOT}/opensc-${CHOST}-${BUILD_VERSION}-setup.exe"
 
 ; The default installation directory
 InstallDir $PROGRAMFILES\opensc
@@ -19,7 +17,7 @@ InstallDirRegKey HKLM "Software\opensc" "Install_Dir"
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
 
-!define base_dir ".\"
+!define base_dir "${IMAGEROOT}"
 !define opensc_files "opensc\*"
 !define engine_pkcs11_files "engine_pkcs11\*"
 !define openvpn_files "openvpn\*"
