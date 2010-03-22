@@ -5,6 +5,7 @@ Copyright (c) 2008-2009 Alon Bar-Lev <alon.barlev@gmail.com>
 $Id$
 
 ????-??-?? - Version 010
+	nsis installation package, thanks to François Leblanc
 -	zlib-1.2.3
 +	zlib-1.2.4
 
