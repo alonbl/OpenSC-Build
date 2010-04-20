@@ -9,7 +9,7 @@ $Id$
 -	openssl-1.0.0.beta5
 +	openssl-1.0.0
 -	zlib-1.2.3
-+	zlib-1.2.4
++	zlib-1.2.5
 
 2010-03-04 - Version 009
 -	openssl-1.0.0.beta4
