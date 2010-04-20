@@ -164,6 +164,7 @@ build_dep() {
 			INCLUDE_PATH="${OPENSC_ROOT}/include" \
 			LIBRARY_PATH="${OPENSC_ROOT}/lib" \
 			BINARY_PATH="${OPENSC_ROOT}/bin" \
+			SHARED_MODE=1 \
 			install || \
 			die "make zlib"
 	else
