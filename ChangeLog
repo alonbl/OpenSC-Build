@@ -7,9 +7,13 @@ $Id$
 ????-??-?? - Version 010
 	nsis installation package, thanks to François Leblanc
 -	openssl-1.0.0.beta5
-+	openssl-1.0.0
++	openssl-1.0.0a
 -	zlib-1.2.3
 +	zlib-1.2.5
+-	lzo-2.02
++	lzo-2.03
+-	opensc-0.11.13
++	opensc-0.12
 
 2010-03-04 - Version 009
 -	openssl-1.0.0.beta4
