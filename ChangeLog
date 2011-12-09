@@ -4,6 +4,10 @@ Copyright (c) 2008-2009 Alon Bar-Lev <alon.barlev@gmail.com>
 
 $Id$
 
+????-??-?? - Version 012
+-	libiconv-1.13.1
++	libiconv-1.14
+
 2011-09-28 - Version 011
 -	openssl-1.0.0a
 +	openssl-1.0.0e
